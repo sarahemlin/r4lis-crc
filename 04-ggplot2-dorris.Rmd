@@ -1,1 +1,249 @@
 # Visualizing your project with _ggplot2_ {#ggplot2}
+
+## Learning Objectives {#ggplot-los}
+
+1. Describe various geom functions in _ggplot2_ for making plots.
+2. Use appropriate code to load the _ggplot2_ library and other relevant libraries into RStudio.
+3. Generate basic column plots using the relevant geom functions in _ggplot2_.
+4. Apply the `aes()` function to customize plots.
+5. Apply legends and labels to plots.
+ 
+## Terms You'll Learn {#ggplot-terms}
+* Aesthetic mapping
+* Geometric object
+* Coordinate system
+* Polar coordinate system
+* Facet
+* Scale
+* Theme
+
+## Scenario {#ggplot2-scenario}
+You were asked by your library to generate some data visualizations about the demographic profile of St. Louis City.  Specifically, you need data visualizations of the top ten census block groups and occupations with the highest and lowest unemployment rates.  
+
+## Packages & Datasets needed {#ggplot-pkgs}
+```{r dplyr-pkgs}
+library(tidyverse)
+library(tidycensus)
+library(gapminder)
+library(readr)
+```
+
+## Introduction to _ggplot2_ {#ggplot2-intro}
+The _ggplot2_ package creates data visualizations such as histograms and plots.  Its syntax comes from Leland Wilkinson’s _Grammar of Graphics_ [@wilkinson2005], which makes layers of graphics by mapping aesthetic attributes to geometric objects [@wickham2020].  Aesthetic attributes are things like size, color, and shape.  A geometric object can be a plot that could be a bar, line, or point plot.  For this exercise, we will focus on creating bar plots because we will be working with one discrete variable, the census tracts, and one continuous variable, the unemployment rates. Data scientists refer to such data visualizations as "plots" regardless of the type of data visualization.
+
+## Components of a plot {#plot-components}
+A typical plot contains data, a coordinate system, and a geometry.  The bare minimum code to create a plot is: `ggplot(data = DATA, mapping = aes(MAPPINGS)) +  geom_function()`. The `gg` in `ggplot` stands for the "Grammar of Graphics" that was introduced in the previous section.
+
+The function `ggplot()` calls the package, and in the parenthesis you apply aesthetic mappings to your data. For example, aesthetic mappings indicate which variable is on the x-axis and which is on the y-axis. You can also apply different stylistic mappings to the plot by plotting the points by size, shape, or color.  Then, you add a layer using the `geom()` function, which, for example, could be a histogram (`geom_hist()`), scatterplot (`geom_point()`), or a line plot (`geom_line()`).  This list is not exhaustive; the _ggplot2_ cheat sheet^[https://www.rstudio.com/resources/cheatsheets/] lists all of the varieties of plots that are available.
+
+You can further customize your plot by specifying the statistical transformation (also known as stat, see section 3.7 in _R for Data Science_^[https://r4ds.had.co.nz/data-visualisation.html]) and position of how you display your values (simply known as position). You can also add a coordinate system, facets, scales, and themes.  
+
+## Coordinate Systems {#coordinate-systems}
+You plot your data on a coordinate system.  Coordinate system options in _ggplot2_ include a cartesian coordinate system, a polar coordinate system, and a spatial coordinate system.
+
+**Cartesian coordinate system**:  A two-dimensional coordinate system based on a horizontal x-axis, a vertical y-axis, and diagonal z-axis.  You can also flip the x and y axes, plot the coordinates on a fixed ratio, and transform coordinates.
+
+**Polar coordinate system**:  A two-dimensional coordinate system that consists of a reference point and an angle from a reference direction
+
+**Spatial coordinate system**: A spatial coordinate system comprises lines of latitude which run parallel to the equator and longitude, which runs parallel to the prime meridian. We will go more into spatial coordinate systems in chapter 6, using the _tmap_ package.
+
+## Before we start {#start-plots}
+We will be using the `male_low_unemployment`, `female_low_employment`, and `unemployment_data` csv files that we created in chapter 3. Make sure that you have these data imported in RStudio. 
+```{r load-data}
+male_low_unemployment <- read_csv("data/male-low-unemployment.csv")
+female_low_unemployment <- read_csv("data/female-low-unemployment.csv")
+unemployment_data <- read_csv("data/unemployment_data.csv")
+```
+
+We'll also recreate the high and low unemployment objects we used in chapter 3.
+```{r high-low}
+# Arrange by descending unemployment rate and get the ten highest unemployment rates
+high_unemploy <- unemployment_data %>%
+  arrange(desc(unemployment_rate)) %>%
+  head(n = 10)
+
+low_unemploy <- unemployment_data %>%
+  arrange(unemployment_rate) %>%
+  head(n = 10)
+```
+
+
+### Plotting the Census block groups by unemployment rate with `geom_col()`
+
+You use `geom_col()` for a continuous and discrete variable. To add a layer to your plot you will need to use `+` and then call your function afterwards. First, we will plot the ten Census block groups with the highest and lowest unemployment rates:
+
+```{r ten-highest}
+# Ten Census block groups with the highest unemployment rates
+high_unemp_plot <- high_unemploy %>%
+  ggplot(aes(x = unemployment_rate, y = reorder(NAME, unemployment_rate))) + geom_col()
+
+high_unemp_plot
+```
+Let's break down this code. We are creating a variable called `high_unemp_plot` which uses the `high_unemploy` data which is passed to the ggplot function via the pipe (`%>%`) operator. We then call the `ggplot()` function in which the unemployment rate will be on the x-axis whlie the Census tract name is on the y-axis. The `reorder` function will reorder the Census tracts based on the unemployment rate. As a result, the Census tract with the highest unemployment rate will be on top of the y-axis while the Census tract with the lowest unemployment rate will be on the bottom of the y-axis. The same method is applied to create the `low_unemp_plot` to indicate the Census tracts with the lowest rates of unemployment.
+
+```{r ten-lowest}
+# Ten Census block groups with the lowest unemployment rates
+low_unemp_plot <- low_unemploy %>%
+  ggplot(aes(x = unemployment_rate, y = reorder(NAME, unemployment_rate))) +  geom_col() 
+
+low_unemp_plot
+```
+
+Let's clean up these labels and add a title for the two plots. We do this through the `labs()` function. We do not have to re-write all the code to create the plot since we stored it in a variable. All we will have to do is to add the labels layer through using `+` and then `labs()`.
+
+```{r high-plot}
+high_unemp_plot <- high_unemp_plot +
+  labs(title, "Ten census tracts with the highest unemployment rate", x = "Unemployment Rate", y = "Census Tract")
+
+high_unemp_plot
+```
+
+We will also do the same for low_unemp_plot.
+```{r low-plot}
+low_unemp_plot <- low_unemp_plot + 
+  labs(title = "Ten census tracts with the lowest unemployment rate", x = "Unemployment Rate", y = "Census Tract")
+
+low_unemp_plot
+```
+
+Now that we have the top ten Census block groups with the highest and lowest unemployment rates, let's see their occupations. First, let's use the `female_low_unemployment` data frame to create a plot seeing the top ten female occupations with the lowest unemployment. By getting information about these occupations, you can target your outreach by providing information and training opportunities with these occupations.
+
+```{r low-female-jobs}
+low_unemployment_female_plot <- female_low_unemployment %>%
+  ggplot(aes(x = total, y = reorder(female_jobs, total))) +
+  geom_col() 
+
+low_unemployment_female_plot
+```
+
+As we did in the previous set of plots, we created a variable called `low_unemployment_female_plot` in which we have the total number of occupations on the x-axis and the type of jobs on the y-axis. We call the reorder function to order the bar plot by the number of jobs. The occupation with the highest number of jobs (Management, business, science and arts) is on the top of the bar plot and the occupation with the lowest number of jobs (Business & financial operations) is on the bottom of the bar plot. Let's now do the same with the male occupations.
+
+```{r low-male-jobs}
+low_unemployment_male_plot <- male_low_unemployment %>%
+  ggplot(aes(x = total, y = reorder(male_jobs, total))) +
+  geom_col()
+
+low_unemployment_male_plot
+```
+
+Now we will add a title and x and y axis label layer to the two plots through `+ labs()`.
+
+```{r low-female-labels}
+low_unemployment_female_plot <- low_unemployment_female_plot +
+  labs(title = "Top ten female occupations in census tracts with lowest unemployment",
+       x = "Total", y = "Occupation")
+
+low_unemployment_female_plot
+```
+
+```{r low-male-labels}
+low_unemployment_male_plot <- low_unemployment_male_plot +
+  labs(title = "Top ten male occupations in census tracts with lowest unemployment",
+       x = "Total", y = "Occupation")
+
+low_unemployment_male_plot
+```
+
+## Additional _ggplot2_ concepts {#more-ggplot2}
+This chapter aims to get you up and running by creating data visualizations using _ggplot2_, which is by no means exhaustive. The _ggplot2_ library has robust features, but here are a few concepts you should know.
+
+### Facets
+If you want to plot data by a particular categorical variable, you can use facets.  Our data is not facet-friendly so instead, we will use one of the built-in R datasets similar to our topic at hand. The gapminder dataset, a dataset on global demographics, will work with facets.
+
+One way in which we can create facets through the `facet_wrap()` function. Use this function when you want to facet one variable [wickham2016]. Let's look at the life expectancy (lifeExp) vs. GDP per capita (gdpPercap) by decade from 1957 to 2007. Before we can start faceting, we must to get the data.
+
+```{r gapminder-variable}
+#saving the gapminder data into a variable.
+gapminder_data <- gapminder 
+#separating the gapminder data by decade from 1957 to 2007.
+gapminder_decade_data <- gapminder_data %>%
+  filter(year %in% c(1957, 1967, 1977, 1987,1997, 2007))
+```
+We create a variable called `gapminder_data` by calling the built-in dataset called gapminder. We want the data by decade from 1957 to 2007, so we create another variable called `gapminder_decade_data` and we filter the data by decade from 1957 to 2007 using the `%in%` operator to extract the specific years that is indicated in the vector `c(1957, 1967, 1977, 1987,1997, 2007)`.
+
+```{r gdp-lifeexp}
+gdp_lifeexp_year_plot <- gapminder_decade_data %>%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  geom_point() +
+  facet_wrap(~ year)
+
+gdp_lifeexp_year_plot
+```
+Now we will create a variable called `gdp_lifeexp_year_plot` that will store the plot with GDP per capita on the the x-axis and life expectancy on the y-axis. We will make this plot a scatterplot by adding `geom_point()` and facet by year through the `facet_wrap` function. The year inside the `facet_wrap` function indicates that you want to facet by year.
+
+You can use `facet_grid` to facet your plot using two variables [@wickham2016]. Let's create a plot that shows the relationship between the GDP per capita (gdpPercap) and life expectancy (lifeExp) in the Americas and Europe by decade from 1957 to 2007. First, we need to filter the `gapminder_decade_data` to only include data from the Americans and Europe.  We will then use the `facet_grid` function to facet the plots by continents. We supply a variable before and after the `~`.
+```{rgdp-life-dec}
+gdp_lifeexp_dec_plot <- gapminder_decade_data %>%
+  filter( continent == "Americas" | continent == "Europe") %>%
+  ggplot(aes(lifeExp, gdpPercap)) +
+  geom_point() +
+  facet_wrap( continent ~ year)
+
+gdp_lifeexp_dec_plot
+```
+
+To spread values across columns, we would need to use `.~` [@wickham2020]. In the case of our data, to do this by continent, we would need to use `facet_grid(. ~ continent)`  
+
+```{r gdp-life-plot}
+gdp_lifeexp_plot <- gapminder_decade_data %>%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  geom_point() +
+  facet_grid(.~continent)
+
+gdp_lifeexp_plot
+```
+
+In this code chunk, we created a variable to store our plot called `gdp_lifeexp_plot` in which life expectancy (`lifeExp`) is on the y-axis and (`gdpPercap`) is on the x-axis. As you can see, the plot shares the same y-axis which allows for easy comparison across columns. Likewise, we can spread values across rows using `~.` Let's flip the plot from above where we can spread GDP per capita and life expectancy by continent and compare row-wise.
+
+```{r gdp-life-compare}
+gdp_lifeexp_plot <- gapminder_decade_data %>%
+  ggplot(aes(gdpPercap, lifeExp)) +
+  geom_point() +
+  facet_grid(continent ~.)
+
+gdp_lifeexp_plot
+```
+With this plot, we can see that the variables share the same x-axis that allows us to compare row-wise. However this plot doesn't seem aesthetically pleasing the previous one since it uses too much space row-wise. It's important to test which type of faceting is appropriate for your data.
+
+Now that we know about `facet_grid` and `facet_wrap`, let's revisit why the data we have been using isn't appropriate for faceting. Our data isn't appropriate for faceting because we do not have any categorical variables in our data so we can do any subsetting. Each variable in our data has one value attributed to it; each Census tract and occupation has one value attributed to it. To best show this, let's create a facet grid in faceting the unemployment rate by Census tract using the `NAME` variable through `facet_grid`.
+```{r high-facet}
+high_unemp_plot <- high_unemp_plot +
+  facet_grid(~NAME)
+
+high_unemp_plot
+```
+This faceting of the unemployment rate by Census tract is not neccessary because it is redundant to facet by Census tract to indicate one unemployment rate per Census tract. 
+
+### Scales
+Scales change how the plot looks. Changing the scales, such as the minimum and maximum values in the x and y axes and the data breaks, can make your visualization more readable. For example, in the last plot of the top ten female occupations in Census tracts with the lowest unemployment, the data is broken up by 2000 units, with the max range being 6,000. Let's change the scale in which the data is broken up by 1,000 units, with the max range being 7,000.
+```{r low-scale}
+low_unemployment_female_plot <- low_unemployment_female_plot +
+  scale_x_continuous(breaks = seq(1000,7000, by = 1000)) + 
+  labs(title = "Top ten female occupations in census tracts with lowest unemployment",
+       x = "Total", y = "Occupation")
+
+low_unemployment_female_plot
+```
+We call the low employment plot and build upon it by adding a scale layer using `+` and the `scale_x_continous` function. within that function is the code `seq(1000, 7000, by = 1000)` in which the minimum x-axis value is 1,000 and the maximum value is 7,000 and each break in the x-axis by 1,000.
+
+### Themes
+If you do not like the default theme of your plot, there are several built-in themes that you can use. For more themes, you can use the ggthemes^[https://github.com/jrnold/ggthemes] package by Jeffrey Arnold. Let's change the plot on the top ten male occupations in Census tracts with the lowest unemployment to `theme_classic()`, which removes the grid lines.
+
+```{r low-theme}
+low_unemployment_male_plot <- low_unemployment_male_plot +
+  theme_classic()
+
+low_unemployment_male_plot
+```
+
+## Summary {#ggplot2-summary}
+In this chapter we learned how to create data visualizations with the _ggplot2_ package. We also learned how to use the _tidycensus_ package in accessing Census data within RStudio which involves accessing the Census API through a Census API key. _ggplot2_ was created based on the "Grammar of Graphics" in which one graphic element is layered on top each other. While there are various types of visualizations that one can create with _gglot2_ we focused on creating bar plots with `geom_col()` and scatter plots with `geom_point()`. We were able to explore these functions through creating bar plots of Census tracts that has the lowest rate of unemployment based on sex using _tidycensus_. We also created scatterplots using `geom_point()` with gapminder data. With these plots, we were able to further explore various _ggplot2_ functions, such as facets, scales, and themes.  
+
+## Additional resources {#ggplot2-resources}
+  * Data visualization with _ggplot2_ cheatsheet:
+https://www.rstudio.com/resources/cheatsheets/
+  * _ggplot2: Elegant Graphics for Data Analysis_: https://ggplot2-book.org/index.html
+
+## Further Practice {#ggplot2-practice}
+1. For the high and low unemployment plots, change the plot's theme.
+2. Explore the built-in R datasets through the _datasets_ package. Choose a dataset and create facets of a particular variable.
