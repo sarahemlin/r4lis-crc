@@ -1,0 +1,193 @@
+---
+title: "St. Louis Shiny Dashboard"
+output: flexdashboard::flex_dashboard
+runtime: shiny
+---
+
+
+
+```{r stl-shiny-setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+
+# loading libraries
+library(tidyverse)
+library(flexdashboard)
+library(tmap)
+library(sf)
+library(DT)
+library(shiny)
+
+```
+
+
+
+```{r global_setup, include = FALSE}
+aldermen_info = read_csv("data/aldermen-contact.csv")
+male_low_unemployment <- read_csv("data/male-low-unemployment.csv")
+female_low_unemployment <- read_csv("data/female-low-unemployment.csv")
+stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp") 
+stl_tracts <- st_read("unemployment_tract/unemployment_tract.shp")%>%
+  rename("unemployment_rate" = "unmply_") %>%
+  mutate(unemployment_rate = unemployment_rate * 100)
+data <- stl_wards
+
+
+layers <- c("Select a variable", "Unemployment rate by ward", "St. Louis Wards")
+```
+
+
+St. Louis Ward Maps
+===================================
+
+Column{.sidebar}
+-----------------------------------
+```{r, echo = FALSE}
+ selectInput("var", "St. Louis Maps", choices = layers, selected = layers[1])
+
+
+```
+
+Column
+-----------------------------------
+```{r, echo=FALSE}
+# this is the map that will load
+tmapOutput("map")
+
+output$map <- renderTmap({
+       tmap_mode("view")
+       tm_shape(data, unit = "mi")+
+       tm_polygons(zindex = 401)
+})
+
+
+#we need to create a reactive variable
+
+
+
+
+observeEvent(input$var,
+{
+  if(input$var == layers[2]){
+    data <- stl_tracts
+    tmapProxy("map", session, {
+      tm_remove_layer(401) +
+        tm_shape(data) +
+         tm_fill("unemployment_rate", title= "Umemployment rate",
+          popup.vars = c("% unemployed" = "unemployment_rate"), 
+          id = "NAME")+
+        tm_polygons(zindex = 401)
+    })
+  }
+  
+  if(input$var == layers[3]){
+    data <- stl_wards
+    tmapProxy("map", session, {
+      tm_remove_layer(401) +
+        tm_shape(data) +
+        tm_polygons(zindex = 401)
+    })
+  } 
+})
+
+
+#})
+
+
+
+# observeEvent(input$var,
+#              {
+#                if(input$var == layers[1]){
+#                  data <- stl_tracts
+#                  tmapProxy("map", session, {
+#                    tm_remove_layer(401) +
+#                      tm_shape(data) +
+#                      tm_polygons(zindex = 401)
+#                  })
+#                }
+#              })
+# 
+# 
+# 
+# 
+
+
+
+```
+
+
+Plots
+===================================
+
+Column {.sidebar}
+-----------------------------------
+```{r, echo = FALSE}
+
+stl_plot_choices <- c("Choose a plot", "Occupations with the lowest unemployment (female)", "Occupations with the lowest unemployment (male)")
+selectInput("plots", "Plots", choices = stl_plot_choices, selected = stl_plot_choices[1])
+
+```
+
+Column
+-----------------------------------
+```{r, echo = FALSE}
+
+plotOutput("plot")
+output$plot <- renderPlot({
+  ggplot(female_low_unemployment, aes(x = total, y = reorder(female_jobs, total))) +
+  geom_col() +
+  labs(title = "Top ten female occupations in census tracts with lowest unemployment",
+       x = "Total", y = "Occupation")
+  
+})
+
+ observeEvent(input$plots, {
+   
+  if(input$plots == stl_plot_choices[2]){
+    output$plot <- renderPlot({
+      ggplot(female_low_unemployment, aes(x = total, y =     
+      reorder(female_jobs, total))) +
+  geom_col() +
+  labs(title = "Top ten female occupations in census tracts with lowest unemployment",
+     x = "Total", y = "Occupation")
+})
+  }    
+    
+   
+    if(input$plots == stl_plot_choices[3]){
+     output$plot <- renderPlot({
+       ggplot(male_low_unemployment, aes(x = total, y = reorder(male_jobs, total))) +
+   geom_col() +
+   labs(title = "Top ten male occupations in census tracts with lowest unemployment",
+        x = "Total", y = "Occupation")
+    })
+    }  
+ })
+
+  
+  # if(input$plots == stl_plot_choices[2]){
+  #   output$plot <- renderPlot({
+  #       ggplot(female_low_unemployment, aes(x = total, y = reorder(female_jobs, total))) +
+  # geom_col() +
+  # labs(title = "Top ten female occupations in census tracts with lowest unemployment",
+  #      x = "Total", y = "Occupation")
+# }  
+ 
+
+   
+
+  
+
+
+```
+
+
+
+Alderman Info
+===================================
+
+```{r, echo = FALSE}
+datatable(aldermen_info)
+```
+
+
+

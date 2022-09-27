@@ -1,0 +1,98 @@
+---
+title: "St. Louis Dashboard"
+output: flexdashboard::flex_dashboard
+---
+
+
+
+
+```{r stl-setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# loading libraries
+library(tidyverse)
+library(flexdashboard)
+library(tmap)
+library(sf)
+library(DT)
+
+```
+
+
+
+```{r, include = FALSE}
+aldermen_info = read_csv("data/aldermen-contact.csv")
+male_low_unemployment <- read_csv("data/male-low-unemployment.csv")
+female_low_unemployment <- read_csv("data/female-low-unemployment.csv")
+stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp") 
+stl_tracts <- st_read("unemployment_tract/unemployment_tract.shp")%>%
+  rename("unemployment_rate" = "unmply_") %>%
+  mutate(unemployment_rate = unemployment_rate * 100)
+```
+
+St. Louis Ward Map
+===================================
+
+Column 1
+-----------------------------------
+St. Louis Wards
+```{r, echo=FALSE}
+tmap_mode("view")
+tm_shape(stl_wards, unit = "mi")+
+  tm_polygons()
+
+```
+
+Column 2
+------------------------------------
+Unemployment Rate in St. Louis by Ward
+```{r, echo = FALSE}
+tmap_mode("view")
+tm_shape(stl_tracts) +
+  tm_fill("unemployment_rate", title= "Umemployment rate",
+          popup.vars = c("% unemployed" = "unemployment_rate"), 
+          id = "NAME")
+
+```
+
+
+Unemployment Plots
+===================================
+
+
+Column 1
+-----------------------------------
+
+### Lowest unemployment (female)
+```{r, echo= FALSE}
+low_unemployment_female_plot <- female_low_unemployment %>%
+  ggplot(aes(x = total, y = reorder(female_jobs, total))) +
+  geom_col() +
+  labs(title = "Top ten female occupations in census tracts with lowest unemployment",
+       x = "Total", y = "Occupation")
+
+low_unemployment_female_plot
+```
+
+
+Column 2
+-----------------------------------
+
+### Lowest unemployment(male)
+```{r, echo= FALSE}
+low_unemployment_male_plot <- male_low_unemployment %>%
+  ggplot(aes(x = total, y = reorder(male_jobs, total))) +
+  geom_col() +
+  labs(title = "Top ten male occupations in census tracts with lowest unemployment",
+       x = "Total", y = "Occupation")
+
+low_unemployment_male_plot
+```
+
+
+Alderman Info
+===================================
+```{r, echo = TRUE}
+datatable(aldermen_info)
+```
+
