@@ -1,0 +1,34 @@
+# Conclusion {#conclusion}
+
+## Wrapping up...for now {#wrapping-up}
+Congratulations on reaching the end of this book!  The book's purpose was to give you a basic foundation in R, which you can use for library-related work.  Your work will benefit the fictional you and your fictional partners in our storyline in terms of gaining more knowledge and experience with using R and applying it for a particular library-based purpose.  This knowledge and skills will also benefit you in the real world.  To recap what you have done:
+
+1. Become familiar with the RStudio IDE
+2. Learn how to do basic data cleaning and data scrubbing tasks with the _dplyr_ package.
+3. Make a basic plot with the _ggplot2_ package. 
+4. Do web scraping with the _rvest_ package.
+5. Create a static and interactive map with the _tmap_ package.
+6. Do text mining operations such as tokenization, sentiment analysis, and tf-idf function.
+7. Create a basic R markdown document.
+8. Create a flexdashboard using R Markdown.
+9. Create Shiny apps within the flexdashboard.
+10. Have a conceptual understanding of machine learning using the _tidymodels_ package. 
+
+The final deliverables you created through the scenario are an R Markdown document and Flexdashboard that integrates a Shiny app in order to summarize the wards in St. Louis with the lowest and highest unemployment along with the top ten occupations in each of these wards.  
+
+## Where do you go from here?
+You're probably wondering what's next.  This book focused on the breadth of R, not the depth.  Really where you go from here depends on what you want to focus on moving forward.  We recommend the seminal text _R for Data Science_^[https://r4ds.had.co.nz/] by Garrett Grolemund and Hadley Wickham, for a more robust foundation with R.  _R for Data Science_, more commonly referred to as R4DS, will give a more in-depth overview of such topics as _dplyr_, _ggplot2_, and tidy data principles.
+
+Suppose you want to learn more about _tmap_ and to handle spatial data in R in general.  In that case, we recommend _Geocomputation in R_^[https://geocompr.robinlovelace.net/] by Robin Lovelace, Jakub Nowosad, and Jannes Muenchow.  This book gives a comprehensive overview of the types of spatial data, operations related to the different types and components of spatial data, making maps with R with various packages other than _tmap_, and applications in various fields.
+
+When it comes to web scraping and text mining, you can't go wrong with _Web Scraping with R_^[https://steviep42.github.io/webscraping/book/] by Steve Pittard and _Text Mining with R_^[https://www.tidytextmining.com/index.html] by Julia Silge and David Robinson.  _Web Scraping with R_ provides several real-world examples for web scraping using APIs and guidance on dealing with websites that return XML and JSON when attempting to scrape them.  With _Text Mining with R_, there is a more in-depth discussion on topics such as tf-idf and sentiment analysis and covers subjects not included in this text, such as n-grams and correlations.
+
+An excellent text to refer to if you want to learn more about _rmarkdown_ and _flexdashboard_ is _R Markdown: The Definitive Guide_^[https://bookdown.org/yihui/rmarkdown/] by Yuhui Xie, J.J. Allaire,  and Garrett Grolemund.  It gives more detail about R Markdown syntax and FlexDashboard and real-world examples and other outputs you can create with R Markdown, such as presentations, document templates, and websites.
+
+We only covered the surface of _shiny_ in this book.  For a more comprehensive discussion on Shiny, _Mastering Shiny_^[https://mastering-shiny.org/] by Hadley Wickham is a good resource, which gives a more in-depth discussion of reactivity and best practices for making Shiny apps.  Another topic that we didn't go in-depth with is how to do machine learning with the _tidymodels_ package.  _Tidy Modeling with R_^[https://www.tmwr.org/] by Max Kuhn and Julia Silge will expose you to both the basics and the basics of tidy modeling through case studies using housing data.
+
+## Data management: Never do work without it {#data-management}
+We provided many resources to further your knowledge on the various topics covered in this book.  However, it is also crucial that you implement sound data management practices that allow your data to be FAIR which, to reiterate, means that your data is findable, accessible, interoperable, and reusable (see chapter 1 for further reference).  One example of sound data management principles includes having a README file that mentions elements such as the name of your project, contact information, file, and variable listings, along with an explanation of the variables.  Another example is ensuring that your variable names do not have special characters and that an underscore or hyphen is used instead of spaces since spaces can cause problems when reading in a file or variables.  A good resource for data management is _Data Management for Researchers_^[https://pelagicpublishing.com/products/data-management-for-researchers-briney#] by Kristin Briney.  By implementing sound data management practices, you're helping others understand what you are doing and the future you as well when you have to revisit a project that you haven't worked on in a while. 
+
+## Final send-off on your data science journey {#good-bye}
+This book has launched your data science journey, but it is just the beginning.  We hope that through this book, you learned basic data science concepts such as data scrubbing and data visualization, and that you gained confidence by working through the scenarios for each chapter.  We hope you can see how some of the things you learned can be applied to your daily work and find an interesting topic you would explore more in-depth.  Good luck on your data science journey, and while there might be turns and road bumps on the way, keep on going and don't stop learning! 
