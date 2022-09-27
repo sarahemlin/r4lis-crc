@@ -1,9 +1,9 @@
 --- 
-title: "A Chapman & Hall/CRC Book Example Using bookdown"
-author: "Frida Gomam"
+title: "Hands-on Data Science for Librarians"
+author: "Sarah Lin & Dorris Scott"
 date: "`r Sys.Date()`"
 documentclass: krantz
-bibliography: [book.bib, packages.bib]
+bibliography: [book.bib]
 biblio-style: apalike
 link-citations: yes
 colorlinks: yes
@@ -11,50 +11,40 @@ lot: yes
 lof: yes
 site: bookdown::bookdown_site
 description: "A book example for a Chapman & Hall book."
-github-repo: yihui/bookdown-crc
+github-repo: sarahemlin/r4lis-crc
 graphics: yes
 #cover-image: images/cover.jpg
 ---
 
-```{r setup, include=FALSE}
+```{r book-setup, include=FALSE}
 options(
   htmltools.dir.version = FALSE, formatR.indent = 2, width = 55, digits = 4
 )
-
-# install the packages needed by this book; you fill out c(), e.g. c('ggplot2', 'dplyr')
-lapply(c('xfun'), function(pkg) {
-  if (system.file(package = pkg) == '') install.packages(pkg)
-})
 ```
 
 # Preface {-}
 
-Hi there, this is my great book.
+Resources to learn R are all over the internet and most libraries.  However, easy access to resources doesn't mean it's easy to learn to do data science in R.  This book spends time on an introduction to R and basic data cleaning tasks that are taught elsewhere because we want to provide a gentle, low-stress introduction to key aspects of data science using R.  Librarians have varied backgrounds, but for most of us, rigorous education in mathematics, statistics, and computer science are not part of our expertise.  That doesn't mean we can't learn to code or do data science in code.  Based on our own experiences, we are particuarly concerned that you, our reader, are able to access the content in this book with minimal frustration, exasperation, and despair.
 
-## Why read this book {-}
+Using resources at the end of each chapter, in the appendix, and in the bibliography of this book will provide you with next steps to further your data science skills beyond this introductory text.  With a basic foundation in data science skills, any of the resources we link to should be comprehensible, if challenging.  We wish you well on our data science journey!
 
-It is very important...
+## What you'll need {-}
+Access to a personal computer (desktop or laptop) with permission to install programs, such as the Chrome web browser and extensions.
 
-## Structure of the book {-}
+## Software information, notes, and conventions {-}
 
-Chapters \@ref(introduction) introduces a new topic, and ...
-
-## Software information and conventions {-}
-
-I used the **knitr**\index{knitr} package [@xie2015] and the **bookdown**\index{bookdown} package [@R-bookdown] to compile my book. My R session information is shown below:
+We used the _knitr_ package and the _bookdown_ package to compile this book. Our R session information is shown below:
 
 ```{r}
 xfun::session_info()
 ```
 
-Package names are in bold text (e.g., **rmarkdown**), and inline code and filenames are formatted in a typewriter font (e.g., `knitr::knit('foo.Rmd')`). Function names are followed by parentheses (e.g., `bookdown::render_book()`).
+Package names are in italic text (e.g., _rmarkdown_), and inline code and filenames are formatted in a typewriter font (e.g., `knitr::knit('foo.Rmd')`). Function names are followed by parentheses (e.g., `bookdown::render_book()`).
+
+We use the assignment (`<-`) operator in all code chunks to assign and store objects in this book, but you can also use the equals sign (`=`).
+
+In 2022, the company RStudio, PBC changed its name to Posit, PBC.  The open source IDE created by this company is now known as either "the RStudio IDE", or simply "RStudio."  We use both terms interchangeably in this book.
 
 ## Acknowledgments {-}
 
-A lot of people helped me when I was writing the book.
-
-```{block2, type='flushright', html.tag='p'}
-Frida Gomam  
-on the Mars
-```
-
+We would like to thank the following individuals for the gift of their time, insight, and support while we wrote and edited this book: Greg Wilson, Myfawnwy Johnston, Patrick Alston, Emily Nimsakont, Luke Johnston, Carl Howe, Emil Hvitfeldt and Julia Silge.
