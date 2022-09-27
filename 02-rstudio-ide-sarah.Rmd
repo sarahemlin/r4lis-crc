@@ -160,7 +160,7 @@ This chapter took you from no experience coding in R to interacting with data in
 
 ## Further Practice {#rstudio-study}
   * Read in a csv file of your own and run the same summary functions: `head()`, `tail()`, `summary()`
-  * Install _janeaustenR_ for use in chapter 6\@ref(text-study)
+  * Install _janeaustenR_ for use in chapter 6
 
 ## Additional Resources {#rstudio-resources}
   * _Hands-on programming with R_, Garrett & Hadley
