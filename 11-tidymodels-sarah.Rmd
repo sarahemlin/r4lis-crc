@@ -1,1 +1,92 @@
 # Using _tidymodels_ to Understand Machine Learning {#tidymodels}
+
+## Learning Objective: recognize the various processing and analysis functions of machine learning using the tidymodels package. {#ml-los}
+
+1. Recall the steps in machine learning and the correlating _tidymodels_ packages. 
+2. Describe the ways text mining is used in machine learning algorithms.
+3. Describe uses of machine learning related to employment.
+4. Identify areas of potential bias in machine learning.
+
+## Terms You'll Learn {#ml-terms}
+  * machine learning
+  * algorithm
+
+## Scenario {#ml-scenario}
+Job seekers with whom you've worked at the library report many resumés submitted but few callbacks.  You've heard many companies use resumé screening software, but you'd like to understand how that works and how it affects hiring.  If there's a negative effect, you want to prepare the program participants with knowledge of how to navigate the reality of machine learning in the job application process.
+
+## Packages & Datasets Needed {#ml-pkgs}
+```{r tidymodels-pkgs}
+library(tidymodels)
+```
+
+## Introduction {#ml-intro}
+This chapter is a brief introduction to machine learning, but unlike the rest of the book, this chapter will stay reasonably high level and not include any coding.  Machine learning code requires knowledge of advanced mathematics (linear algebra); while learning to do machine learning is possible, the background knowledge and theory behind the steps covered in this chapter require in-depth explanations beyond the scope of this work.  Learning or re-learning linear algebra takes time.  However, there is still a significant benefit from understanding the process, even if you can't replicate it on your own (yet).  You can still benefit from knowing the process to better interact with ML in your work and assist your library users.
+
+The benefits of learning ML is closely related to its ubiquity in our lives.  It powers many applications and systems  that librarians and library users rely on for professional and personal work.  Professionally, we see ML in predictive search and the search results of discovery systems and research databases we use and maintain daily.  In our personal lives, our search engines queries, shopping, media platforms, and social media are all powered by ML, as are many civic (government services eligibility, job applications) and financial services (credit scores, loan approvals) we interact with regularly.
+
+Machine learning should merely augment human decision-making.  In practice, however, we tend towards a blind faith in computers that elevates their output above our own intelligence and convinces us they can solve every problem.  As information professionals, we need to understand how machine learning works so that we know its flaws and its promise and can communicate that to our colleagues and users.  This chapter will cover what machine learning is and how it works, focusing on one machine learning R package.
+
+## What ML is {#what-ml-is}
+**Machine learning** (ML) is a type of artificial intelligence (AI) that uses linear regression to find patterns within data, whether that data contains numbers or text.  ML can surface patterns that aren't discernible to the human eye.  There are two types of ML: supervised and unsupervised.  For simplicity, this chapter will explain the steps of supervised ML, which means that there is a human rather than an algorithmic review of settings and decisions within the ML algorithm.  An **algorithm** is a series of repeated programmatic steps, which you could think of as a formula or recipe applied to data to "predict something: how likely it is that a squiggle on a page is the letter A; how likely it is that a given customer will pay back the mortgage money a bank loans to him; which is the best next move to make in a game of tic-tac-toe, checkers, or chess" [@broussard2018].  The steps of the algorithm repeat in the same order with any new data.  Overall, machine learning algorithms take raw data, tidy it, and then manipulate it to get the best predictive results.
+
+Machine learning is related to, but ultimately very different in practice than statistics.  With ML, the goal is to make accurate predictions using any method.  As a result, ML will use any statistical model that produces more accurate predictions.  While statistics use hypotheses, machine learning does not.  In statistics, you would compare your model against random chance to see if it performed better, but in machine learning, the only question is which model fits the data the best.
+
+## How ML works in R (_tidymodels_) {#ml-r}
+In the R package ecosystem, _tidymodels_^[https://www.tidymodels.org/] is the Tidyverse equivalent for machine learning.  Like the Tidyverse, Tidymodels combines several packages that each focus on a step in the machine learning process.  We'll cover five packages that map to the five main stages of machine learning.
+
+### Choose a Model (_parsnip_) 
+As previously mentioned, machine learning only wants the best model that fits the data, so that is the criteria by which data scientists choose their model.  They need to figure out what linear regression method would give the best results for the provided data.  The model functions as the engine of the algorithm.  Examples of models include K nearest neighbors (KNN) and root mean squared error (RMSE).  The Tidymodels package to use is called _parsnip_.
+
+### Create a recipe (_recipes_)
+The Tidymodels _recipes_ package creates the algorithm, or formula, for machine learning that handles data the same way every time.  The recipe documents which variables the algorithm will use for predicting and the steps involved in preparing the data.  Consistent data preprocessing has a significant impact on prediction accuracy.  The recipe is vital for consistency because the data workflow is complex.
+
+### Sample the data (_rsample_)
+One crucial part of the process is dividing your dataset into training and testing datasets.  The testing dataset is set aside until the end of the entire ML process to test the algorithm's accuracy.  The testing dataset is used immediately with the model and the recipe.  There are many decisions to make related to sample size, which all impact prediction accuracy.  Too-small testing sets result in unreliable predictions because you wouldn't have tested the model fit enough.  On the other hand, if the training dataset is too small, then the model fit will be poor.
+
+### Tune the model (_tune_)
+Because ML aims to get the best possible model that fits the data at hand, a sizable portion of the process is devoted to adjusting or tuning the model to get a better fit.  Tidymodels uses the _tune_ package for model tuning.  Changing the algorithm parameters and hyperparameters in different ways can improve model fit.  Resampling is one example of this, which reconfigures the training dataset in various ways to determine which produces the best results.
+
+### Measure the fit of the model (_yardstick_)
+The last package for this chapter is _yardstick_, which measures mathematically how accurately the chosen model fits the data.  This package would be run on the testing dataset (reserved from the beginning and not used to develop the algorithm) as a final validation step to see how well it predicts.  "Good" models might fit 80% of their data points.  Depending on the algorithm's use in decision-making, 80% accuracy might be benign or harmful.  For example, 75% accuracy on which movie appears in the "Suggested" tab on your streaming platform that you definitely want to watch has a different impact than an algorithm used to predict who's children should be removed by the state that is wrong about 25% of the time [@eubanks2018].  
+
+## Problems with machine learning {#ml-problems}
+Implicit in the above ML steps is that all ML algorithms are created by humans using data created by humans.  Keeping this top of mind helps us remember that AI has no magic.  Even if a commercial library database uses an ML algorithm that we can't see (called a 'black box' algorithm), we know that their algorithm uses the same preceding steps.  Knowing the ML process means we can understand where potential bias or error is likely to sneak in, allowing us to critique and analyze an ML algorithm.  
+
+The impact of model accuracy is just one area where problems can arise in the real-world application of machine learning algorithms.  Human bias and problems with the data can combine and compound in ways that can be invisible to data scientists, producing unintended negative consequences for machine learning-augmented decision-making.
+
+### The data
+The root cause of many ML problems is often the data it ingests.  Sometimes,  the data itself is too small or too problematic.  Quite often, the data we need to solve a problem doesn't exist, so we use the data we can find to act as a proxy for the information we don't have.  This generalization is understandable, but again, the validity and credibility of an ML-based decision deserve careful thought to avoid unintended negative consequences.
+
+Contrasting online shopping data with social services data illustrates this point well.  Companies want us to buy early and often and use data to predict what we will buy.  Online merchants track every click and keystroke on their shopping platforms, collecting tremendous data to drive product suggestions and email marketing campaigns.  ML algorithms can't infer intent, though, so you might purchase a gift and then get a related purchase suggestion that's irrelevant.  The downstream consequences of a wrong prediction might result in minor annoyance.  Data collected by child welfare agencies is entirely different.  These agencies aim to predict which children among the entire population are at risk for neglect or abuse [@eubanks2018].
+
+Data is collected by and created by humans, encoding all of our biases and societal problems: "if the data comes from humans, it will likely have a bias in it"[@shane2019].  An excellent example of this problem is zip codes.  Zip codes (postal codes) are used as a clean data point to say where someone lives or where an event occurs.  However, in the United States, zip codes are an unintended proxy for race [@oneil2016].  For decades a process called redlining forced non-white populations into particular geographic areas, often using natural barriers like highways.  At the same time, white people could live and buy houses anywhere they wanted [@rothstein2017].  Real estate isn't a mobile possession, leaving areas with low access to services and jobs synonymous with their non-white populations.  Even though redlining is illegal, racial disparities between zip codes persist.    
+
+### Assumptions
+The assumptions we make about the data we have is another potential problem.  Essentially, an ML algorithm assumes that the data at hand can answer the question posed by the researcher.  Not all of these assumptions are harmful; even if benign, practitioners need to be aware of the underlying assumptions in the data, the algorithm, and the analysis.  Using one set of data as a proxy for data you don't have or doesn't exist should be a red flag that assumptions are present[@oneil2016].  A common belief is when we think an algorithm can replace tasks usually performed by humans.  A good proving ground for this is library discovery systems, which use text as its data input to predict which library resources are most relevant for each search query.  Librarians are experts in answering reference questions, but library discovery systems aren't a 1:1 replacement.  We must remember that "search engines are best when retrieving information about the mundane business of everyday life...but library discovery systems were explicitly designed to deal with topics from the ordinary to the complex" [@reidsma2019].  There's an assumption baked into the acquisition of these systems that they will be objective and accurate when they are often wrong and always opaque about how relevancy is determined.  People created ML algorithms that encode their bias within the math.
+
+### Sampling
+Dividing your dataset into different samples for training and testing your algorithm is vital in machine learning, but the division itself can be problematic.  For example, if your dataset is too small, your training set might produce a model that doesn't work on the testing dataset.  Alternatively,  irregularly distributed data results in inaccurate models and predictions even if the dataset is large enough.   An example is earthquakes, which are not evenly distributed and are very hard to predict [@silver2012].
+
+### Tuning & measuring fit
+The final step in machine learning is tuning the model and measuring the fit, which says how accurate its predictions are.  The greatest danger in tuning is overfitting the model.  These tradeoffs speak to another potential ML problem: if the model fits the data perfectly, it might predict horribly in real life.  For example, using data on one town's home sale prices to predict another town's sale prices may or may not work.  Another example with more at stake is overfitted models, such as a self-driving car trained on images with grass on both sides of the road that can't process arriving at the start of a bridge [@shane2019]. 
+
+## Machine learning in employment
+The reality of job searches today is that when "you submit a job application or resumé via an online job site, an algorithm generally determines whether you meet the criteria to be evaluated by a human or whether you're rejected outright" [@broussard2018].  All job seekers in your outreach program must deal with this, so it's essential to understand what is happening and why.
+
+Resumé screening algorithms utilize text mining and apply machine learning to words rather than numbers.  The goal is to parse the words in a resumé or application to predict which candidates will be most successful; those predicted to do well get passed on to the next round in the hiring process.  When we think of the words included in an employment application, names, industry keywords, company names, and educational institutions are listed.  All of the previously enumerated problems with machine learning are present in a screening algorithm, and there is no recourse for an individual denied an interview for what they think is an illegitimate reason.
+
+These algorithms use words that appear in "successful" applications with current applications.  Yet if a company has hired many people who are similar in name, education, or background, then the algorithm will predict that only people like them will be successful.  Because we believe computers are objective, algorithms are often undisputed, and our decisions encode the disparities and inequities in our current environment.  The lexicons used in textual machine learning are of particular concern because models trained on lexicons that originated from crawling the internet can have word associations that reflect the worst parts of our culture to us.  Hazardous word associations can manifest in automated restaurant reviews that consistently demote Mexican restaurants because the training data contained a strong word association between "Mexican" and "illegal," a term with a negative connotation that carries over to what the algorithm associates as a related word [@shane2019].  While we can't say if a particular algorithm is making negative associations where it shouldn't be, we know that using lexicons based on the internet is popular because the internet holds a vast number of words, and crawling it to create a dataset is free.
+
+## Summary {#ml-summary}
+Machine learning is ubiquitous, but we need to understand how it works because it's so intertwined with our personal and professional lives.  Supervised machine learning uses data to fit a model that predicts results, where people decide to set sample sizes, set model parameters, and adjust the model's fit.  Because people make the data and they make the algorithms, they are both fallible, and placing blind faith in algorithmic predictions as "truth" is unwarranted.  There are many places where bias can creep into an ML algorithm, making it critical that we probe the origins of the analyzed data and unpack assumptions therein.
+
+## Further Practice {#ml-study} 
+  * Work through the examples in each chapter of _Supervised machine learning for text analysis in R_ by Emily Hvitfeldt & Julia Silge: https://smltar.com/
+
+## Additional Resources {#ml-resources}
+  * Tidymodels website: https://tidymodels.org
+  * _You look like a thing and I love you_ by Janelle Shane
+  * _Masked by trust_ by Matthew Reidsma
+  * _Automating inequality_ by Virginia Eubanks
+  * _Weapons of math destruction_ by Cathy O'Neil
+  * _Artificial unintelligence_ by Meredith Broussard
