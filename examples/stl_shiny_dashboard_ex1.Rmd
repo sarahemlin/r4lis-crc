@@ -1,0 +1,49 @@
+---
+title: "St. Louis Shiny Dashboard"
+output: flexdashboard::flex_dashboard
+runtime: shiny
+---
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+# loading libraries
+library(tidyverse)
+library(flexdashboard)
+library(tmap)
+library(sf)
+library(DT)
+library(shiny)
+
+```
+
+
+
+```{r global, include = FALSE}
+aldermen_info = read_csv("data/aldermen-contact.csv")
+male_low_unemployment <- read_csv("data/male-low-unemployment.csv")
+female_low_unemployment <- read_csv("data/female-low-unemployment.csv")
+stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp") 
+stl_tracts <- st_read("unemployment_tract/unemployment_tract.shp")%>%
+  rename("unemployment_rate" = "unmply_") %>%
+  mutate(unemployment_rate = unemployment_rate * 100)
+data <- stl_wards
+
+
+layers <- c("Select a variable", "Unemployment rate by ward", "St. Louis Wards")
+```
+
+
+St. Louis Ward Maps
+===================================
+
+Column{.sidebar}
+-----------------------------------
+```{r, echo = FALSE}
+ selectInput("var", "St. Louis Maps", choices = layers, selected = layers[1])
+
+```
+
+
