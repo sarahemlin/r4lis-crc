@@ -1,0 +1,39 @@
+\cleardoublepage 
+
+# (APPENDIX) Appendix {-}
+
+# Dependencies
+
+## iOS Dependencies (Monterey)
+**Homebrew**^[https://brew.sh/] is an application needed by iOS operating systems to install additional software/packages.  Follow the instructions on their website to install Homebrew on your Mac.  The password requested is the one used to log in to your computer.  
+
+* go to https://brew.sh and copy their install code for Homebrew for Mac
+* open the terminal and paste that code; follow any prompts
+* if it was installed a while ago, then brew update is needed
+* once installed, run the following commands (one at a time):
+* brew install udunits
+* brew install gdal
+* brew install proj **this might already be installed
+
+*for Mac users on Big Sur who encounter problems with the geospatial package installations, try:
+  +install.packages(c("rgdal","sf"), "https://mac.R-project.org") and answer yes to first prompt, but no to compilation from source
+
+## Windows Dependencies
+In order to install and compile packages, Windows users need to install _Rtools42_^[https://cran.r-project.org/bin/windows/Rtools/rtols42/rtools.html].  Once _Rtools42_ is installed, there's no need to install the _Rtools_ package.
+
+## Package dependencies for this book
+Some of the packages used in this book have other packages that they depend on.  You'll usually find this out in one of two ways.  Either the dependencies will be installed with the package you're installing and you'll see messages notifying you in the console, or else the `install.packages()` function will return an error and let you know which package(s) is missing.  You'll then want to install that package(s) first before returning to install the initial package you were trying to install.
+
+# Additional Skills
+
+## Using the Shell or command line on your computer
+If you don't know how or don't feel comfortable using the command line on your computer, we recommend attending a session of the Carpentries' UNIX Shell class, or working through the course materials online^[https://librarycarpentry.org/lc-shell/].
+
+## Using GitHub & Git
+While version control systems like Git are widely used in academia, all librarians can benefit from using them to back up their code and collaborate with others.  If Git and GitHub are new to you, we recommend the Carpentries' Version Control with Git class.  Check their website for upcoming classes near you, or work through the course materials online^[https://swcarpentry.github.io/git-novice/].
+
+## Troubleshooting package installation problems
+Sometimes, depending on your particular computer OS and package installations, installing the geospatial packages will not work.  We've found that using `installing packages problem solved by:
+install.packages("https://cran.r-project.org/bin/macosx/contrib/4.2/stars_0.5-5.tgz", repos = NULL, type = .Platform$pkgType)`, replacing the URL in that code with a link to the appropriate binary version of the package you need to download from CRAN.  Repeat with new package links until all packages have been installed.
+
+There are lots of times when the code you have will return an error message.  When that happens, most users copy the code and paste it into a search box and see what the internet returns.  Sites like StackOverflow^[https://stackoverflow.com/] and the Posit Community forum^[https://community.rstudio.com] are common places to ask questions about problems you're having or read answers to other people's questions that might be similar to yours.  You might need quite a bit of trial and error before you're able to fix your problem(s); take comfort in the thousands and thousands of posts on those sites which show that other people have problems with their code, too.
