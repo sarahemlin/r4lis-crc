@@ -1,0 +1,335 @@
+# Tidying data with _dplyr_ {#dplyr}
+
+## Learning Objective: write code to perform data scrubbing functions with the Tidyverse's _dplyr_ package. {#dplyr-los}
+
+1. Use the IDE to load the _dplyr_ package.
+2. Identify data elements in RStudio's IDE that need to be changed.
+3. Summarize the most common functions _dplyr_ is used for.
+4. Use _dplyr_ functions to normalize fields in a dataset.
+
+## Terms You'll Learn {#dplyr-terms}
+* API
+
+## Scenario {#dplyr-scenario}
+You need data on unemployment in the city of St. Louis, and the first step to creating visualizations related to unemployment requires you to read the data and tidy it.  You'd like to target your outreach to areas of low unemployment, so you will need to prepare data to use in determining those.  Occupations with the highest employment would be helpful to target training for job seekers for jobs that are in demand.
+
+## Packages & Datasets Needed {#dplyr-pkgs}
+```{r pkgs-dplyr, include=FALSE}
+#package installed as part of the _tidyverse_ install in the IDE chapter
+library(tidyverse)
+#but there are a bunch of dependencies that also need to be loaded to work with this Census data
+library(units)
+library(sf)
+library(tmap)
+library(tidycensus)
+```
+
+## Introduction {#dplyr-intro}
+This chapter is focused on census data and learning data tidying functions to create an unemployment dataset for use in subsequent chapters.  We are aided in this endeavor by the _tidycensus_ package^[https://walker-data.com/tidycensus/], which interfaces with the US Census data and returns data that are ready to work with Tidyverse packages.  _Tidycensus_ lets us access census data for many communities, St. Louis included.  The Census contains data about employment, occupation, gender, and location. 
+
+## Getting started with U.S. Census data {#census-setup}
+Census data is available from the Census **API**^[https://en.wikipedia.org/wiki/API].  An API, or application programming interface, allows our computer to access the computer(s) storing the census data.  APIs enable computers to talk to each other; they are a valuable tool for data scientists who want to get a dataset directly from the source.  Many data sources provide API access to their databases, which we will visit again in chapter 7.
+
+### Census prerequisites
+Before using _tidycensus_ to query the Census database, each user must have a unique identifier: an API key.  This unique authorization code from the Census website allows you to access census data^[http://api.census.gov/data/key_signup.html].
+
+1. Create a Census API key
+```{r census-api-key, include=FALSE}
+census_api_key("ed1fd61839f37607fd14fc8bfbdcf66b1f0f470f")
+```
+
+If you're following along and entering this code into your R console, sign up for your own census data key, delete the '#' and replace '"your-key-here" with your own API key.
+```{r user-key}
+# census_api_key("your-key-here") 
+```
+
+2. Get FIPS codes
+We are limiting our analysis to the city of St. Louis and need to restrict our data to that area.  To do that, we'll use the Federal Information Processing Series (FIPS) Codes.  Thankfully, `fips_codes` are already part of _tidycensus_.
+
+```{r fips-codes}
+head(fips_codes)
+```
+When combined with the state, each county has a code that allows us to query the Census database for only the geographic area of interest, like St. Louis.
+
+### Census variables
+The Census collects a lot of data about the US population, but we don't need all that data!  To narrow our scope to the most applicable data, we must select the Census report year, type, and metadata fields (variables) we want to analyze.  The American Community Survey^[https://www.census.gov/programs-surveys/acs] will provide the most valuable data for our analysis.  
+
+1. Review all Census variables
+We'll use `load_variables()` to review the 2019 ACS 5-year survey data variables.
+```{r census-variables, cache=TRUE}
+var_2019 <- load_variables(2019, "acs5")
+var_2019
+```
+
+2. Create new object of variables
+Having pulled in the FIPS codes that allow us to identify data from St. Louis and the variable names from the 2019 ACS, we can now create a new object that contains only the data we want:
+  * Survey: 5-year ACS
+  * Year: 2019
+  * Locations: St. Louis County, Missouri
+  * Variables:
+    + Total population: B23025_001
+    + Population not in the labor force (unemployed): B23025_007
+
+One Base R function that we'll rely on for this code is `c()`, which concatenates strings (numbers or text) into one value.  We'll concatenate the two variables we're interested in: total population and the number of unemployed.  The function `get_acs()` passes the metadata requirements to the Census database, returning the data we need for each Census tract.  We're interested in all the variables and want to see them spread out across the columns, so we will use the `output = "wide"` setting to adjust the output.
+```{r census}
+data <- get_acs(geography = "tract", variables = c(
+  total_pop = "B23001_001",
+  unemployed = "B23025_007"), state = "MO", county = "510", year = 2019, output = "wide")
+
+data
+```
+
+## Tidy data tools from _dplyr_ {#dplyr-tidy-tools}
+
+The data we've pulled is the total population and the number of unemployed, but that's not what we need to know.  We need an unemployment rate; from there we can determine where the areas of highest and lowest unemployment are alongside occupation data. To do this, we must tidy and modify the _tidycensus_ data we have.
+
+The _dplyr_ package within the Tidyverse contains a constellation of functions designed for data modification. Some of the actions we'll need to perform are: 
+
+  * renaming columns
+  * creating a new column for the unemployment rate, which involves performing a mathematical operation on other columns
+  * combine columns
+  * sort column values
+  * combine several functions sequentially
+  * choose specific columns or rows within the table
+  * see a snapshot of a dataset
+  * group data by column value
+  * filter a subset of a table
+  * combine datasets based on common column values
+
+## Getting started with _dplyr_ functions {#dplyr-start}
+One of the formative concepts of the Tidyverse, which we will rely upon heavily through the remainder of the book, is the use of the pipe: `%>%`.  This operator can be read within a code chunk as 'then': it allows us to call _dplyr_ functions sequentially to make our code more readable.  You will often see code from the Tidyverse written in an "object [then] function" syntax pattern.
+
+### Create  unemployment rate 
+We'll use the "object [then] function" pattern to create a new variable and column for the unemployment rate.  The ACS doesn't provide an unemployment rate, so we must calculate it from the columns we have: total population and population unemployed.  Our task here is two-fold: 1) create a new column and 2) populate each row in the column with its calculated unemployment rate. This is the number unemployed divided by the total population:
+```{r unemploy-rate}
+unemployment_data <- data %>%
+  mutate(unemployment_rate = as.numeric(unemployedE)/as.numeric(total_popE)) 
+```
+In plain English, the code above says "create a new object called `unemployment_data`, which takes the `data` object and then makes a new column in it called `unemployment_rate`; fill the rows in that new column with the value of the number unemployed divided by the total population."
+
+### Save unemployment data
+Before going any further, we will save the `unemployment_data` object to a CSV file in the `data/` sub-directory, or folder, using the `write_csv()` function from _readr_:
+```{r unemploy-data-file}
+write_csv(unemployment_data, "data/unemployment_data.csv") 
+```
+
+### Find the areas with the highest unemployment
+Getting back to _dplyr_, we need to figure out where the areas with the highest levels of unemployment are.  We'll use `arrange()` to sort the dataset by unemployment rate in descending order and then look at only the top 10 locations in the dataset.
+```{r high-area}
+# Arrange by descending unemployment rate and get the ten highest unemployment rates; `arrange()` defaults to ascending sort order
+high_unemploy <- unemployment_data %>%
+  arrange(desc(unemployment_rate)) %>%
+  head(n = 10)
+
+high_unemploy
+```
+
+### Find the areas with the lowest unemployment
+Using the same `arrange()` function, but using the default ascending sort, we'll create a new object of only the values with the lowest unemployment rate.
+```{r low-area}
+low_unemploy <- unemployment_data %>%
+  arrange(unemployment_rate) %>%
+  head(n = 10)
+
+low_unemploy
+```
+
+## Occupation data {#occupation-data}
+Now that we have the top ten Census block groups with the highest and lowest unemployment rates, let's see the occupations in those Census blocks. We will select the full table of data instead of only specific variables. 
+
+### Occupation data for the city of St. Louis
+
+When we use the `get_acs` function to pull that survey's data from the census website, we need to specify which particular table of data we need.  "Tract" is the unit of geographical measurement we need; we'll include the year, county/state, and the code for the table.  A Census tract is a usually permanent subdivision of a county with about 4,000 people that reside within its bounds^[https://www.census.gov/programs-surveys/geography/about/glossary.html#par_textimage_13].  We'll use the _dplyr_ function `glimpse()` to see a list of column names and a snippet of the values for each. This function is handy to see an object at a glance to understand what it contains.
+
+```{r job-table}
+occupation_data  <- get_acs(
+  geography = "tract", 
+  state = "MO", 
+  county = "510", 
+  year = 2019, 
+  table = "C24010")
+
+glimpse(occupation_data)
+```
+The GEOID variable, which contains the Census tract ID, is present in both the occupation data and the employment data.
+
+### Save occupation data
+We'll save the occupation data to a CSV file so we can use it later.
+```{r csv-job-data}
+write_csv(occupation_data, "data/occupation_data.csv") 
+```
+
+### Select occupations with the highest and lowest unemployment
+We will need to use `filter()` to get the occupations with the highest and lowest unemployment rates and then use `arrange()` again to sort the results.  Our challenge here is that we don't want all the occupation data; we only need the occupations for the areas we already identified in the `low_unemploy` and `high_unemploy`objects we created in the previous section.  We'll need to use the `%in%` operator, which lets us select only specific rows that match both datasets.
+
+To find the occupations (jobs) with the lowest unemployment, we want to take the `occupation_data` object and filter out the rows whose GEOID matches the GEOID field in the `low_unemploy` object.  Then we want to arrange them in descending order by the `estimate` column.
+```{r low-jobs}
+low_unemploy_jobs <- occupation_data %>% 
+  filter(GEOID %in% low_unemploy$GEOID) %>%
+  arrange(desc(estimate)) 
+
+glimpse(low_unemploy_jobs)
+```
+
+We'll perform the same functions for jobs with the highest unemployment but compare rows against the `high_unemploy` object.
+```{r high-jobs}
+high_unemploy_jobs <- occupation_data %>% 
+  filter(GEOID %in% high_unemploy$GEOID) %>%
+  arrange(desc(estimate)) 
+
+glimpse(high_unemploy_jobs)
+```
+
+### Combine occupation names with unemployment data
+The high and low unemployment datasets include the occupation in the `variable` column, but only as a code.  At the beginning of this chapter, we read the list of variables and saved it to the `var_2019` object.  We need to combine these two datasets to bring only the variables we need from `var_2019` to 'high_unemploy_jobs` and `low_unemploy_jobs`.
+
+_dplyr_ has several 'join' functions that allow you to combine and filter data in one step. This book will utilize:
+  *`left_join()`^[https://dplyr.tidyverse.org/reference/mutate-joins.html]
+    +Adds columns from the second dataset to the first dataset
+  *`anti_join()`^[https://dplyr.tidyverse.org/reference/filter-joins.html]
+    +Returns all rows from the first dataset that **do not** have a match in the second dataset
+
+To combine the variable names with the code that matches our low unemployment occupations, we'll take our `low_unemploy_jobs` dataset and use `left_join()` to add fields from `var_2019`.  We need to indicate which column we should join the dataset by, which is another way of identifying which column is present in both datasets.  The column appearing in both datasets will match the rest of the rows and columns together.
+```{r unemploy-labels}
+low_unemploy_jobs_join <- low_unemploy_jobs %>%
+  left_join(var_2019, by = c("variable" = "name"))
+
+glimpse(low_unemploy_jobs_join)
+```
+When we look at the combined dataset, we can see only one variable (name) column, but otherwise, the `left_join()` added all the columns from `var_2019` to `low_unemploy_jobs`.
+
+### Group occupations by gender
+Census data includes binary gender classifications (male/female) for each occupation.  We can de-duplicate the dataset by separating the rows by gender.
+
+We'll use several new _dplyr_ functions to refine the dataset.  To group variables with the same values, `group_by()` lets us specify which column name to use.  The pipe comes in handy as we work several sequential steps on the same `low_unemploy_jobs_join` dataset.  First, we'll group the values by `label`.  Then we'll use `summarize()`^[https://dplyr.tidyverse.org/reference/summarise.html], which is a function that will create a new table of summarized data containing the grouped labels and the column called `total` that will contain the total `estimate` column.  We can then arrange the values in descending order.  The last function we will pipe into this object is `filter()`, which we'll use to exclude gross aggregate estimates that are over 10,000.  Excluded values include the total estimate and total female estimate rows because we're interested in specific occupation data.
+```{r low-jobs-ct}
+low_unemploy_jobs_ct <- low_unemploy_jobs_join %>% 
+  group_by(label) %>%
+  summarize(total = sum(estimate)) %>%
+  arrange(desc(total)) %>%
+  filter(total < 10000) 
+```
+
+### Occupations with the lowest unemployment for men
+Because the occupation rankings differ for men and women, we need to separate the data into two datasets by gender.  To do that, we'll utilize the _stringr_ package.  We can use the `str_detect()` function to `filter()` rows that match the character string we specify.  In this case, we want to filter the label column for the value of "Male."  Then we can arrange the results in descending order and look at the top 10 occupations with the lowest unemployment rate for men.
+```{r low-unemploy-male}
+# Get the top ten by male occupations by detecting the word "Male"
+# in the labels using the `str_detect()` function in _stringr_
+low_unemploy_jobs_male <- low_unemploy_jobs_ct %>% 
+  filter(str_detect(label, "Male")) %>%
+  arrange(desc(total)) %>%
+  head(n = 10)
+
+low_unemploy_jobs_male
+```
+
+### Occupations with the lowest unemployment for women
+To create a new dataset showing occupations with the lowest unemployment for women, we will follow the same steps except for searching the label column for "Female."
+```{r low-unemploy-female}
+# Get the top ten by female occupations by detecting the word
+# "Female" in the labels using the `str_detect()` function in _stringr_
+low_unemploy_jobs_female <- low_unemploy_jobs_ct %>% #clean
+  filter(str_detect(label, "Female")) %>%
+  arrange(desc(total)) %>%
+  head(n = 10)
+
+low_unemploy_jobs_female
+```
+The occupation with the lowest unemployment is the same for men and women: management, business, science, and the arts.  The remaining nine lowest unemployment occupations differ between genders, though.
+
+## Clean up metadata {#clean-metadata}
+As we can see from our glimpse of the occupations for women with the lowest unemployment, the occupation labels from the Census are tough to parse.  There are many exclamation points and colons, and several words repeat in addition to the occupation category itself.  Knowing that we want to present this information in a professional context, we will have to spend some time simplifying and relabeling each occupation.
+
+### Simplify and relabel male occupations
+Cleaning up column values is not an unusual tidying task.  In this instance, the irregularities of these values and the small number (ten) of each lend themselves to creating a new object with clean names that we can join with the dataset to provide comprehensible occupation names.
+
+We'll use _tibble_^[https://tibble.tidyverse.org/index.html], another core Tidyverse package to create a tibble (a tidy table) of occupation labels using `tribble()`^[https://tibble.tidyverse.org/reference/tribble.html].  When using `tribble()`, we first include the names of the two columns in our tibble, `label` and `male_jobs`.  Then we proceed to include each value in the tibble we want to create, column by column and row by row.  We will take the existing values for the `label` column from the Census and create a clean version of each occupation in a new column called `male_jobs`.
+
+```{r male-relabel}
+clean_labels_m <- tribble(
+  ~label, ~male_jobs,
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:", "Management, business, science, & arts",
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:", "Business & financial operations",
+  "Estimate!!Total:!!Male:!!Service occupations:", "Service occupations",
+  "Estimate!!Total:!!Male:!!Sales and office occupations:", "Sales & office",
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Computer, engineering, and science occupations:", "Computer, engineering, & science",
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:!!Management occupations", "Management", 
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Education, legal, community service, arts, and media occupations:", "Education, legal, community service, arts, & media",
+  "Estimate!!Total:!!Male:!!Production, transportation, and material moving occupations:", "Production, transportation, & material moving",
+  "Estimate!!Total:!!Male:!!Sales and office occupations:!!Sales and related occupations", "Sales",
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Computer, engineering, and science occupations:!!Computer and mathematical occupations", "Computer & mathematical"
+)
+```
+
+In order to see the beginning of our second clean tidy table, we'll run `glimpse().`
+```{r m-labels}
+glimpse(clean_labels_m)
+```
+
+### Update occupation labels for male unemployment data
+Now that we have a table of clean occupation labels, we can use another `left_join()` to combine `clean_labels_m` with `low_unemploy_jobs_male`.
+```{r low-male-clean}
+low_unemploy_jobs_malec <- left_join(
+  low_unemploy_jobs_male,
+  clean_labels_m,
+  by = 'label'
+  )
+
+glimpse(low_unemploy_jobs_malec)
+```
+
+### Simplify and relabel female occupations
+We'll repeat the same occupation label cleaning steps that we did with male occupations with the female occupations using `tribble()`.  Our column names are `label` and `female_jobs`, and then we will enter the existing labels and their clean counterparts.
+```{r female-relabel}
+clean_labels_f <- tribble(
+  ~label, ~female_jobs,
+  "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:", "Management, business, science, & arts",
+  "Estimate!!Total:!!Female:!!Service occupations:", "Service occupations",
+  "Estimate!!Total:!!Female:!!Sales and office occupations:!!Sales and related occupations", "Sales",
+  "Estimate!!Total:!!Female:!!Sales and office occupations:!!Office and administrative support occupations", "Office & administrative support",
+  "Estimate!!Total:!!Female:!!Sales and office occupations:", "Sales & office",
+  "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:!!Management occupations", "Management",
+  "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:!!Business and financial operations occupations", "Business & financial operations",
+  "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:", "Management, business, & financial",
+  "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:!!Healthcare practitioners and technical occupations:", "Healthcare practitioners & technical",
+  "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:!!Education, legal, community service, arts, and media occupations:", "Education, legal, community service, arts, & media"
+)
+```
+
+In order to see the beginning of our clean tidy table, we'll run `glimpse().`
+```{r f-labels}
+glimpse(clean_labels_f)
+```
+
+### Update occupation labels for female unemployment data
+Again, we'll use the previous tool of `left_join()` to combine the clean labels with the list of female unemployment data we have.
+```{r female-low-jobs}
+low_unemploy_jobs_femalec <- left_join(
+  low_unemploy_jobs_female,
+  clean_labels_f,
+  by = 'label'
+  )
+```
+
+## Create a csv of unemployment data {#unemploy-csv}
+All of the data tidying work we've done in this chapter needs to be saved as new files to use in later chapters.  We'll use _readr_ again to save the male and female unemployment data to individual CSV files.
+
+### 1. Male unemployment
+```{r male-csv}
+write_csv(low_unemploy_jobs_malec, "data/male-low-unemployment.csv")
+```
+
+### 2. Female unemployment
+```{r female-csb}
+write_csv(low_unemploy_jobs_femalec, "data/female-low-unemployment.csv")
+```
+
+## Summary {#dplyr-summary}
+The _dplyr_ package is a foundational Tidyverse package.  We used it in this chapter to modify our census data into tables that we can use in later chapters to analyze and plot in R.  We've sorted, renamed, grouped, joined, and filtered St. Louis census data.  Other functions have allowed us to create new columns with new data, such as `mutate()` and `summarize()`.  Data rarely arrives in a state perfectly ready for analysis in the real world.  Messy data makes learning data cleaning functions essential for work in data science.  We also learned to use the central Tidyverse operator: the pipe.  With the pipe, we can stack functions one after the other to manipulate our data efficiently and quickly.  Using _dplyr_ functions with the pipe presents a stark contrast to years of working with Excel files that have to be manually modified repeatedly in (hopefully) the same way.
+
+## Further Practice {#dplyr-study}
+  * Use the Census API to import a different ACS year for St. Louis, and adjust the column names and variables as appropriate.
+
+## Additional Resources {#dplyr-resources}
+  * Data transformation (_dplyr_) cheatsheet: https://www.rstudio.com/resources/cheatsheets/
+  * R for Data Science (Grolemund & Wickham, 2016)
