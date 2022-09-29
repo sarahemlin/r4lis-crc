@@ -15,7 +15,7 @@
 Job seekers with whom you've worked at the library report many resumés submitted but few callbacks.  You've heard many companies use resumé screening software, but you'd like to understand how that works and how it affects hiring.  If there's a negative effect, you want to prepare the program participants with knowledge of how to navigate the reality of machine learning in the job application process.
 
 ## Packages & Datasets Needed {#ml-pkgs}
-```{r tidymodels-pkgs}
+```{r tidymodels-pkgs, message=FALSE, error=FALSE}
 library(tidymodels)
 ```
 

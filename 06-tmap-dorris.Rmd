@@ -28,7 +28,7 @@ After creating plots of occupations with the lowest unemployment, you decide to 
 - What relevant R packages can be used to create these maps?
 
 ## Packages & Datasets Needed {#tmap-pkgs}
-```{r load-tmp-pkgs, echo=FALSE}
+```{r load-tmp-pkgs, message=FALSE, error=FALSE}
 library(tidyverse)
 library(tidycensus)
 library(tmap)

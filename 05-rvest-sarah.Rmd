@@ -56,9 +56,18 @@ To scrape the aldermen's names and ward numbers, we need the CSS selector `.data
 1. Scrape each alderman's name and ward number 
 
 First, we will use the `read_html()` function to read the webpage we want to scrape. Our second step is to save that scraped webpage in an HTML file so that we can access it later.
-```{r scrape}
+```{r scrape, include=FALSE}
 scrape <- read_html(
   "https://www.stlouis-mo.gov/government/departments/aldermen/Wards-1-28.cfm"
+)
+
+write_html(scrape, "scrape.html")
+```
+
+```{r fake, eval=FALSE}
+scrape <- read_html(
+  "https://www.stlouis-mo.gov/government/departments/aldermen/
+    Wards-1-28.cfm"
 )
 
 write_html(scrape, "scrape.html")

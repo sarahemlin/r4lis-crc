@@ -23,8 +23,7 @@ _flexdashboard_ allows you to create a dashboard using R Markdown. It is a flexi
 ## Packages and datasets needed {#flexdashboard-pkgs}
 We are going to load several familiar packages such as _tidyverse_, _tmap_, and _sf_, with the addition of two new packages which are _DT_ and _flexdashboard_. 
 
-```{r pkgs-flexdashboard, include = FALSE}
-# loading libraries
+```{r pkgs-flexdashboard, message=FALSE, error=FALSE}
 library(tidyverse)
 library(flexdashboard)
 library(tmap)

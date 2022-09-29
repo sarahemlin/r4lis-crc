@@ -22,7 +22,7 @@ Looking for a job is stressful! Being unemployed when you want to be employed is
 
 ## Packages & Datasets Needed {#text-pkgs}
 
-```{r rvest-pkgs}
+```{r rvest-pkgs, message=FALSE, error=FALSE}
 library(tidyverse)
 library(jsonlite)
 library(tidytext)
@@ -97,9 +97,17 @@ We need three code sections to pull the data we need from the NYT.  These code c
 1.  Identify the search query we want to pass to the database.  
 
 We want to search for the word "unemployment" in the US section of the NYT.  This means our query will be "unemployment" and our filter will be the "U.S." section of the newspaper.  We also have to append the API key to that search URL to authorize our API call.  In the chunk below, `paste0` is a base R function that concatenates two character strings.  We want to join the search string with our API key for this search, and save it as an object.  Throughout this chapter we will utilize this object, called `baseurl`, as a representation of our unique API call, which is the query string plus our specific API key. 
-```{r tidytext-baseurl}
+```{r tidytext-baseurl, include=FALSE}
 baseurl <- paste0(
   "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=unemployment&section_name=(U.S.)",
+  api_key
+)
+```
+
+```{r baseurl-fake, eval=FALSE}
+baseurl <- paste0(
+  "http://api.nytimes.com/svc/search/v2/articlesearch.json?
+    q=unemployment&section_name=(U.S.)",
   api_key
 )
 ```

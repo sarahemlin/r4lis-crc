@@ -17,7 +17,7 @@ Now that you created the Flexdashboard, you want to have some interactivity in y
 ## Packages and datasets needed {#shiny-pkgs}
 We will be using the same packages and data from the chapter on flexdashboard with the addition of _shiny_. 
 
-```{r load-shiny-pkgs, include=FALSE}
+```{r load-shiny-pkgs, message=FALSE, error=FALSE}
 # loading libraries
 library(tidyverse)
 library(flexdashboard)

@@ -18,7 +18,7 @@ In addition, R Markdown allows you to include executable code chunks within the 
 
 ## Packages & Datasets Needed {#rmarkdown-pkgs}
 For this chapter, you will need to install and load the _tidyverse, tidycensus, readr, sf_, and _tmap_ packages.  To create the R Markdown document, we also need to load the necessary data if it isn't already loaded.  We will be loading the csv files showing the occupations with the lowest unemployment by sex and our shapefiles of the St. Louis wards and Census tracts, which we created in earlier chapters.
-```{r}
+```{r rmd-pkgs, message=FALSE, error=FALSE, results='hide'}
 library(tidyverse)
 library(tidycensus)
 library(readr)
@@ -31,7 +31,9 @@ female_low_unemployment <- read_csv("data/female-low-unemployment.csv")
 
 # shapefiles
 stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp")
-unemployment_tract <- st_read("unemployment_tract/unemployment_tract.shp")
+unemployment_tract <- st_read(
+  "unemployment_tract/unemployment_tract.shp"
+)
 ```
 
 ## Creating an R Markdown document {#rmd-create}
