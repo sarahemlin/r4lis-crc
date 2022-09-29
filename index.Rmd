@@ -10,7 +10,7 @@ colorlinks: yes
 lot: yes
 lof: yes
 site: bookdown::bookdown_site
-description: "A book example for a Chapman & Hall book."
+description: "R for LIS professionals."
 github-repo: sarahemlin/r4lis-crc
 graphics: yes
 #cover-image: images/cover.jpg
@@ -20,6 +20,7 @@ graphics: yes
 options(
   htmltools.dir.version = FALSE, formatR.indent = 2, width = 55, digits = 4
 )
+
 ```
 
 # Preface {-}
@@ -35,7 +36,7 @@ Access to a personal computer (desktop or laptop) with permission to install pro
 
 We used the _knitr_ package and the _bookdown_ package to compile this book. Our R session information is shown below:
 
-```{r}
+```{r, linewidth=60}
 xfun::session_info()
 ```
 

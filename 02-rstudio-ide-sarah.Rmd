@@ -1,4 +1,19 @@
 # Using RStudio's IDE {#rstudio}
+```{r rstudio-margins, include=FALSE}
+library(knitr)
+hook_output = knit_hooks$get('output')
+knit_hooks$set(output = function(x, options) {
+  # this hook is used only when the linewidth option is not NULL
+  if (!is.null(n <- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    # any lines wider than n should be wrapped
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+```
+
 
 ## Learning Objective: use the RStudio IDE (Integrated Development Environment) for importing data. {#rstudio-los}
 1.  Use your computer knowledge to install RStudio.
@@ -106,13 +121,9 @@ With four panes, the IDE screen looks like this:
 ![RStudio IDE with all four panes](images/4-panes.png)
   
 ## Packages needed for this book {#pkgs-download}
-As you progress in your data science journey, you will install more and more R packages.  As with any new project you start, begin by installing all the packages you will need to use.  Please see the appendix for instructions on installing additional software that these packages depend on to function properly (commonly called 'dependencies').  You might see prompts in the console during this process.  If you're asked to install other packages, say 'yes.'  If you're asked if you want to compile binaries from source, say 'no.'
+As you progress in your data science journey, you will install more and more R packages.  As with any new project you start, begin by installing all the packages you will need to use.  Please see the appendix for instructions on installing additional software that these packages depend on to function properly (commonly called 'dependencies').  You might see prompts in the console during this process.  If you're asked to install other packages, say 'yes.'  If you're asked if you want to compile binaries from source, say 'no.'  Please see the appendix if you encounter error codes during installation.
 
-```{r packages, eval=FALSE}
-# install the packages needed by this book; you may need to install dependencies before proceeding or if you encounter an error message
-
-# Windows users will need to install _Rtools42_ before they can install any other packages; please see the appendix for more information.
-
+```{r packages, eval=FALSE, linewidth=80}
 lapply(
   c(
     "xfun",
@@ -141,8 +152,6 @@ lapply(
     }
   }
 )
-
-# installing _rgdal_ can sometimes result in error codes. Please see the appendix for troubleshooting tips.
 ```
 At the start of all subsequent chapters, you'll notice a code chunk that loads each package into your current session using the `library()` function.  Installing a package happens only once, but loading a package must occur each time you open RStudio or start a new R session.
 
@@ -166,7 +175,7 @@ view(stl_covid)
 ```
 ![Viewing the stl_covid object in the IDE](images/view-covid.png)
 We can also use some built-in base R functions to see snippets of the `stl_covid` dataset.  To see the first ten lines, we can use `head()` and `tail()` to see the last ten lines.  An additional function is `summary()`, which will display summary statistics for each column in the data frame.
-```{r stl-summary}
+```{r stl-summary, linewidth=70}
 head(stl_covid)
 ```
 
