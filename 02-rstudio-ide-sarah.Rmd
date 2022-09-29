@@ -58,6 +58,7 @@ The complete list of the thousands and thousands of contributed R packages is on
 One of the most helpful R packages to become familiar with is the _tidyverse_ package, which is a collection of packages^[https://www.tidyverse.org/packages/] usually referred to as the Tidyverse.  Each of these, listed below, focuses on a different aspect of cleaning or tidying data before it's used or analyzed further.  While it is possible to use "base R," meaning the functions that come loaded with R when installing it, many R users prefer to use the Tidyverse because they make common tasks in R easier.  The Tidyverse packages all work together, and Posit, PBC staff maintain them.
 
 The "core" Tidyverse packages include:
+
 * _ggplot2_, for data visualization
 * _dplyr_, for data manipulation
 * _tidyr_, for data tidying
@@ -68,6 +69,7 @@ The "core" Tidyverse packages include:
 * _forcats_ for factors (a data structure not used in this book)
 
 There are several other additional packages in the Tidyverse, and we will use several of them in this book:
+
 * _httr_, for web APIs
 * _jsonlite_, for JSON files
 * _readxl_, for .xls and .xlsx files. (not used in this book, but useful for those who use Microsoft Excel frequently)

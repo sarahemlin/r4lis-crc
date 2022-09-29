@@ -74,7 +74,10 @@ You use `geom_col()` for a continuous and discrete variable. To add a layer to y
 ```{r ten-highest}
 # Ten Census block groups with the highest unemployment rates
 high_unemp_plot <- high_unemploy %>%
-  ggplot(aes(x = unemployment_rate, y = reorder(NAME, unemployment_rate))) +
+  ggplot(aes(
+    x = unemployment_rate,
+    y = reorder(NAME, unemployment_rate)
+  )) +
   geom_col()
 
 high_unemp_plot
@@ -82,9 +85,12 @@ high_unemp_plot
 Let's break down this code. We are creating a variable called `high_unemp_plot` which uses the `high_unemploy` data which is passed to the ggplot function via the pipe (`%>%`) operator. We then call the `ggplot()` function in which the unemployment rate will be on the x-axis whlie the Census tract name is on the y-axis. The `reorder` function will reorder the Census tracts based on the unemployment rate. As a result, the Census tract with the highest unemployment rate will be on top of the y-axis while the Census tract with the lowest unemployment rate will be on the bottom of the y-axis. The same method is applied to create the `low_unemp_plot` to indicate the Census tracts with the lowest rates of unemployment.
 
 ```{r ten-lowest}
-# Ten Census block groups with the lowest unemployment rates
+# Ten areas with the lowest unemployment rates
 low_unemp_plot <- low_unemploy %>%
-  ggplot(aes(x = unemployment_rate, y = reorder(NAME, unemployment_rate))) +
+  ggplot(aes(
+    x = unemployment_rate,
+    y = reorder(NAME, unemployment_rate)
+  )) +
   geom_col()
 
 low_unemp_plot
@@ -107,7 +113,7 @@ We will also do the same for low_unemp_plot.
 ```{r low-plot}
 low_unemp_plot <- low_unemp_plot +
   labs(
-    title = "Ten census tracts with the lowest unemployment rate", 
+    title = "Ten areas with the lowest unemployment rate", 
     x = "Unemployment Rate", 
     y = "Census Tract"
     )
@@ -191,6 +197,7 @@ gdp_lifeexp_year_plot <- gapminder_decade_data %>%
 
 gdp_lifeexp_year_plot
 ```
+
 Now we will create a variable called `gdp_lifeexp_year_plot` that will store the plot with GDP per capita on the the x-axis and life expectancy on the y-axis. We will make this plot a scatterplot by adding `geom_point()` and facet by year through the `facet_wrap` function. The year inside the `facet_wrap` function indicates that you want to facet by year.
 
 You can use `facet_grid` to facet your plot using two variables [@wickham2016]. Let's create a plot that shows the relationship between the GDP per capita (gdpPercap) and life expectancy (lifeExp) in the Americas and Europe by decade from 1957 to 2007. First, we need to filter the `gapminder_decade_data` to only include data from the Americans and Europe.  We will then use the `facet_grid` function to facet the plots by continents. We supply a variable before and after the `~`.
@@ -225,6 +232,7 @@ gdp_lifeexp_plot <- gapminder_decade_data %>%
 
 gdp_lifeexp_plot
 ```
+
 With this plot, we can see that the variables share the same x-axis that allows us to compare row-wise. However this plot doesn't seem aesthetically pleasing the previous one since it uses too much space row-wise. It's important to test which type of faceting is appropriate for your data.
 
 Now that we know about `facet_grid` and `facet_wrap`, let's revisit why the data we have been using isn't appropriate for faceting. Our data isn't appropriate for faceting because we do not have any categorical variables in our data so we can do any subsetting. Each variable in our data has one value attributed to it; each Census tract and occupation has one value attributed to it. To best show this, let's create a facet grid in faceting the unemployment rate by Census tract using the `NAME` variable through `facet_grid`.
@@ -270,5 +278,5 @@ https://www.rstudio.com/resources/cheatsheets/
   * _ggplot2: Elegant Graphics for Data Analysis_: https://ggplot2-book.org/index.html
 
 ## Further Practice {#ggplot2-practice}
-1. For the high and low unemployment plots, change the plot's theme.
-2. Explore the built-in R datasets through the _datasets_ package. Choose a dataset and create facets of a particular variable.
+* For the high and low unemployment plots, change the plot's theme.
+* Explore the built-in R datasets through the _datasets_ package. Choose a dataset and create facets of a particular variable.

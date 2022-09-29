@@ -18,7 +18,7 @@ You want to advertise your report and outreach program to garner support from go
 ## Packages & Datasets Needed {#rvest-pkgs}
 
 First, we need to load the packages we need into our current environment to access the functions.  We are using _rvest_ and _purrr_ in this chapter while revisiting _dplyr_.
-```{r rvest-pkgs1, echo=FALSE}
+```{r rvest-pkgs1, message=FALSE, error=FALSE}
 library(tidyverse)
 library(rvest)
 library(xml2)

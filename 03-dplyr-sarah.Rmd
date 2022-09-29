@@ -53,15 +53,17 @@ When combined with the state, each county has a code that allows us to query the
 The Census collects a lot of data about the US population, but we don't need all that data!  To narrow our scope to the most applicable data, we must select the Census report year, type, and metadata fields (variables) we want to analyze.  The American Community Survey^[https://www.census.gov/programs-surveys/acs] will provide the most valuable data for our analysis.  
 
 1. Review all Census variables
+
 We'll use `load_variables()` to review the 2019 ACS 5-year survey data variables.
 ```{r census-variables, cache=TRUE}
 var_2019 <- load_variables(2019, "acs5")
 var_2019
 ```
 
-2. Create new object of variables
+2. Create new objects for variables
 
 Having pulled in the FIPS codes that allow us to identify data from St. Louis and the variable names from the 2019 ACS, we can now create a new object that contains only the data we want:
+
 * Survey: 5-year ACS
 * Year: 2019
 * Locations: St. Louis County, Missouri
@@ -327,7 +329,10 @@ clean_labels_f <- tribble(
     arts occupations:!!Management, business, and financial 
     occupations:!!Management occupations", 
   "Management",
-  "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:!!Business and financial operations occupations", "Business & financial operations",
+  "Estimate!!Total:!!Female:!!Management, business, science, and 
+    arts occupations:!!Management, business, and financial 
+    occupations:!!Business and financial operations occupations",
+  "Business & financial operations",
   "Estimate!!Total:!!Female:!!Management, business, science, and 
     arts occupations:!!Management, business, and financial 
     occupations:", 
