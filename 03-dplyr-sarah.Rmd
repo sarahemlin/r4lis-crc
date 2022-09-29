@@ -1,7 +1,6 @@
 # Tidying data with _dplyr_ {#dplyr}
 
-## Learning Objective: write code to perform data scrubbing functions with the Tidyverse's _dplyr_ package. {#dplyr-los}
-
+## Learning Objectives{#dplyr-los}
 1. Use the IDE to load the _dplyr_ package.
 2. Identify data elements in RStudio's IDE that need to be changed.
 3. Summarize the most common functions _dplyr_ is used for.
@@ -14,10 +13,8 @@
 You need data on unemployment in the city of St. Louis, and the first step to creating visualizations related to unemployment requires you to read the data and tidy it.  You'd like to target your outreach to areas of low unemployment, so you will need to prepare data to use in determining those.  Occupations with the highest employment would be helpful to target training for job seekers for jobs that are in demand.
 
 ## Packages & Datasets Needed {#dplyr-pkgs}
-```{r pkgs-dplyr, include=FALSE}
-# package installed as part of the _tidyverse_ install in the IDE chapter
+```{r pkgs-dplyr, message=FALSE, error=FALSE}
 library(tidyverse)
-# but there are a bunch of dependencies that also need to be loaded to work with this Census data
 library(units)
 library(sf)
 library(tmap)
@@ -39,11 +36,12 @@ census_api_key("ed1fd61839f37607fd14fc8bfbdcf66b1f0f470f")
 ```
 
 If you're following along and entering this code into your R console, sign up for your own census data key, delete the '#' and replace '"your-key-here" with your own API key.
-```{r user-key}
-# census_api_key("your-key-here")
+```{r user-key, eval=FALSE}
+census_api_key("your-key-here")
 ```
 
 2. Get FIPS codes
+
 We are limiting our analysis to the city of St. Louis and need to restrict our data to that area.  To do that, we'll use the Federal Information Processing Series (FIPS) Codes.  Thankfully, `fips_codes` are already part of _tidycensus_.
 
 ```{r fips-codes}
@@ -62,13 +60,13 @@ var_2019
 ```
 
 2. Create new object of variables
+
 Having pulled in the FIPS codes that allow us to identify data from St. Louis and the variable names from the 2019 ACS, we can now create a new object that contains only the data we want:
-  * Survey: 5-year ACS
-  * Year: 2019
-  * Locations: St. Louis County, Missouri
-  * Variables:
-    + Total population: B23025_001
-    + Population not in the labor force (unemployed): B23025_007
+* Survey: 5-year ACS
+* Year: 2019
+* Locations: St. Louis County, Missouri
+* Total population: B23025_001
+* Population not in the labor force (unemployed): B23025_007
 
 One Base R function that we'll rely on for this code is `c()`, which concatenates strings (numbers or text) into one value.  We'll concatenate the two variables we're interested in: total population and the number of unemployed.  The function `get_acs()` passes the metadata requirements to the Census database, returning the data we need for each Census tract.  We're interested in all the variables and want to see them spread out across the columns, so we will use the `output = "wide"` setting to adjust the output.
 ```{r census}
@@ -93,16 +91,16 @@ The data we've pulled is the total population and the number of unemployed, but 
 
 The _dplyr_ package within the Tidyverse contains a constellation of functions designed for data modification. Some of the actions we'll need to perform are: 
 
-  * renaming columns
-  * creating a new column for the unemployment rate, which involves performing a mathematical operation on other columns
-  * combine columns
-  * sort column values
-  * combine several functions sequentially
-  * choose specific columns or rows within the table
-  * see a snapshot of a dataset
-  * group data by column value
-  * filter a subset of a table
-  * combine datasets based on common column values
+* renaming columns
+* creating a new column for the unemployment rate, which involves performing a mathematical operation on other columns
+* combine columns
+* sort column values
+* combine several functions sequentially
+* choose specific columns or rows within the table
+* see a snapshot of a dataset
+* group data by column value
+* filter a subset of a table
+* combine datasets based on common column values
 
 ## Getting started with _dplyr_ functions {#dplyr-start}
 One of the formative concepts of the Tidyverse, which we will rely upon heavily through the remainder of the book, is the use of the pipe: `%>%`.  This operator can be read within a code chunk as 'then': it allows us to call _dplyr_ functions sequentially to make our code more readable.  You will often see code from the Tidyverse written in an "object [then] function" syntax pattern.
@@ -127,7 +125,7 @@ write_csv(unemployment_data, "data/unemployment_data.csv")
 ### Find the areas with the highest unemployment
 Getting back to _dplyr_, we need to figure out where the areas with the highest levels of unemployment are.  We'll use `arrange()` to sort the dataset by unemployment rate in descending order and then look at only the top 10 locations in the dataset.
 ```{r high-area}
-# Arrange by descending unemployment rate and get the ten highest unemployment rates; `arrange()` defaults to ascending sort order
+# `arrange()` defaults to ascending sort order
 high_unemploy <- unemployment_data %>%
   arrange(desc(unemployment_rate)) %>%
   head(n = 10)
@@ -225,8 +223,6 @@ low_unemploy_jobs_ct <- low_unemploy_jobs_join %>%
 ### Occupations with the lowest unemployment for men
 Because the occupation rankings differ for men and women, we need to separate the data into two datasets by gender.  To do that, we'll utilize the _stringr_ package.  We can use the `str_detect()` function to `filter()` rows that match the character string we specify.  In this case, we want to filter the label column for the value of "Male."  Then we can arrange the results in descending order and look at the top 10 occupations with the lowest unemployment rate for men.
 ```{r low-unemploy-male}
-# Get the top ten by male occupations by detecting the word "Male"
-# in the labels using the `str_detect()` function in _stringr_
 low_unemploy_jobs_male <- low_unemploy_jobs_ct %>%
   filter(str_detect(label, "Male")) %>%
   arrange(desc(total)) %>%
@@ -238,8 +234,6 @@ low_unemploy_jobs_male
 ### Occupations with the lowest unemployment for women
 To create a new dataset showing occupations with the lowest unemployment for women, we will follow the same steps except for searching the label column for "Female."
 ```{r low-unemploy-female}
-# Get the top ten by female occupations by detecting the word
-# "Female" in the labels using the `str_detect()` function in _stringr_
 low_unemploy_jobs_female <- low_unemploy_jobs_ct %>% # clean
   filter(str_detect(label, "Female")) %>%
   arrange(desc(total)) %>%
@@ -260,16 +254,37 @@ We'll use _tibble_^[https://tibble.tidyverse.org/index.html], another core Tidyv
 ```{r male-relabel}
 clean_labels_m <- tribble(
   ~label, ~male_jobs,
-  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:", "Management, business, science, & arts",
-  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:", "Business & financial operations",
-  "Estimate!!Total:!!Male:!!Service occupations:", "Service occupations",
-  "Estimate!!Total:!!Male:!!Sales and office occupations:", "Sales & office",
-  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Computer, engineering, and science occupations:", "Computer, engineering, & science",
-  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:!!Management occupations", "Management",
-  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Education, legal, community service, arts, and media occupations:", "Education, legal, community service, arts, & media",
-  "Estimate!!Total:!!Male:!!Production, transportation, and material moving occupations:", "Production, transportation, & material moving",
-  "Estimate!!Total:!!Male:!!Sales and office occupations:!!Sales and related occupations", "Sales",
-  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Computer, engineering, and science occupations:!!Computer and mathematical occupations", "Computer & mathematical"
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts
+    occupations:",
+  "Management, business, science, & arts",
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts
+    occupations:!!Management, business, and financial occupations:",
+  "Business & financial operations",
+  "Estimate!!Total:!!Male:!!Service occupations:", 
+  "Service occupations",
+  "Estimate!!Total:!!Male:!!Sales and office occupations:", 
+  "Sales & office",
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts
+    occupations:!!Computer, engineering, and science occupations:",
+  "Computer, engineering, & science",
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts
+    occupations:!!Management, business, and financial
+    occupations:!!Management occupations", 
+  "Management",
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts
+    occupations:!!Education, legal, community service, arts, and
+    media occupations:", 
+  "Education, legal, community service, arts, & media",
+  "Estimate!!Total:!!Male:!!Production, transportation, and material
+    moving occupations:", 
+  "Production, transportation, & material moving",
+  "Estimate!!Total:!!Male:!!Sales and office occupations:!!Sales and
+    related occupations", 
+  "Sales",
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts
+    occupations:!!Computer, engineering, and science 
+    occupations:!!Computer and mathematical occupations", 
+  "Computer & mathematical"
 )
 ```
 
@@ -295,16 +310,36 @@ We'll repeat the same occupation label cleaning steps that we did with male occu
 ```{r female-relabel}
 clean_labels_f <- tribble(
   ~label, ~female_jobs,
-  "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:", "Management, business, science, & arts",
-  "Estimate!!Total:!!Female:!!Service occupations:", "Service occupations",
-  "Estimate!!Total:!!Female:!!Sales and office occupations:!!Sales and related occupations", "Sales",
-  "Estimate!!Total:!!Female:!!Sales and office occupations:!!Office and administrative support occupations", "Office & administrative support",
-  "Estimate!!Total:!!Female:!!Sales and office occupations:", "Sales & office",
-  "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:!!Management occupations", "Management",
+  "Estimate!!Total:!!Female:!!Management, business, science, and 
+    arts occupations:", 
+  "Management, business, science, & arts",
+  "Estimate!!Total:!!Female:!!Service occupations:", 
+  "Service occupations",
+  "Estimate!!Total:!!Female:!!Sales and office occupations:!!Sales
+    and related occupations", 
+  "Sales",
+  "Estimate!!Total:!!Female:!!Sales and office occupations:!!Office
+    and administrative support occupations", 
+  "Office & administrative support",
+  "Estimate!!Total:!!Female:!!Sales and office occupations:", 
+  "Sales & office",
+  "Estimate!!Total:!!Female:!!Management, business, science, and 
+    arts occupations:!!Management, business, and financial 
+    occupations:!!Management occupations", 
+  "Management",
   "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:!!Business and financial operations occupations", "Business & financial operations",
-  "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:", "Management, business, & financial",
-  "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:!!Healthcare practitioners and technical occupations:", "Healthcare practitioners & technical",
-  "Estimate!!Total:!!Female:!!Management, business, science, and arts occupations:!!Education, legal, community service, arts, and media occupations:", "Education, legal, community service, arts, & media"
+  "Estimate!!Total:!!Female:!!Management, business, science, and 
+    arts occupations:!!Management, business, and financial 
+    occupations:", 
+  "Management, business, & financial",
+  "Estimate!!Total:!!Female:!!Management, business, science, and 
+    arts occupations:!!Healthcare practitioners and technical 
+    occupations:", 
+  "Healthcare practitioners & technical",
+  "Estimate!!Total:!!Female:!!Management, business, science, and 
+    arts occupations:!!Education, legal, community service, arts, 
+    and media occupations:", 
+  "Education, legal, community service, arts, & media"
 )
 ```
 
@@ -340,8 +375,10 @@ write_csv(low_unemploy_jobs_femalec, "data/female-low-unemployment.csv")
 The _dplyr_ package is a foundational Tidyverse package.  We used it in this chapter to modify our census data into tables that we can use in later chapters to analyze and plot in R.  We've sorted, renamed, grouped, joined, and filtered St. Louis census data.  Other functions have allowed us to create new columns with new data, such as `mutate()` and `summarize()`.  Data rarely arrives in a state perfectly ready for analysis in the real world.  Messy data makes learning data cleaning functions essential for work in data science.  We also learned to use the central Tidyverse operator: the pipe.  With the pipe, we can stack functions one after the other to manipulate our data efficiently and quickly.  Using _dplyr_ functions with the pipe presents a stark contrast to years of working with Excel files that have to be manually modified repeatedly in (hopefully) the same way.
 
 ## Further Practice {#dplyr-study}
-  * Use the Census API to import a different ACS year for St. Louis, and adjust the column names and variables as appropriate.
+* Use the Census API to import a different ACS year for St. Louis, and adjust the column names and variables as appropriate.
 
 ## Additional Resources {#dplyr-resources}
-  * Data transformation (_dplyr_) cheatsheet: https://www.rstudio.com/resources/cheatsheets/
-  * R for Data Science (Grolemund & Wickham, 2016)
+* Data transformation (_dplyr_) cheatsheet: 
+  https://www.rstudio.com/resources/cheatsheets/
+* _R for Data Science_: 
+  https://r4ds.had.co.nz/

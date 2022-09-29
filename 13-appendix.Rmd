@@ -4,7 +4,7 @@
 
 # Dependencies
 
-## iOS Dependencies (Monterey)
+## iOS Dependencies
 **Homebrew**^[https://brew.sh/] is an application needed by iOS operating systems to install additional software/packages.  Follow the instructions on their website to install Homebrew on your Mac.  The password requested is the one used to log in to your computer.  
 
 * go to https://brew.sh and copy their install code for Homebrew for Mac

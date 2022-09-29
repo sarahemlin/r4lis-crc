@@ -1,21 +1,6 @@
 # Using RStudio's IDE {#rstudio}
-```{r rstudio-margins, include=FALSE}
-library(knitr)
-hook_output = knit_hooks$get('output')
-knit_hooks$set(output = function(x, options) {
-  # this hook is used only when the linewidth option is not NULL
-  if (!is.null(n <- options$linewidth)) {
-    x = knitr:::split_lines(x)
-    # any lines wider than n should be wrapped
-    if (any(nchar(x) > n)) x = strwrap(x, width = n)
-    x = paste(x, collapse = '\n')
-  }
-  hook_output(x, options)
-})
-```
 
-
-## Learning Objective: use the RStudio IDE (Integrated Development Environment) for importing data. {#rstudio-los}
+## Learning Objectives{#rstudio-los}
 1.  Use your computer knowledge to install RStudio.
 2.  Describe the function of each pane in the IDE.
 3.  Modify IDE settings to their liking.
@@ -73,21 +58,21 @@ The complete list of the thousands and thousands of contributed R packages is on
 One of the most helpful R packages to become familiar with is the _tidyverse_ package, which is a collection of packages^[https://www.tidyverse.org/packages/] usually referred to as the Tidyverse.  Each of these, listed below, focuses on a different aspect of cleaning or tidying data before it's used or analyzed further.  While it is possible to use "base R," meaning the functions that come loaded with R when installing it, many R users prefer to use the Tidyverse because they make common tasks in R easier.  The Tidyverse packages all work together, and Posit, PBC staff maintain them.
 
 The "core" Tidyverse packages include:
-  * ggplot2, for data visualization
-  * dplyr, for data manipulation
-  * tidyr, for data tidying
-  * readr, for importing data from CSV files
-  * purrr, for functional programming (such as repetitive functions)
-  * tibble, for tibbles, a more straightforward way to create data frames
-  * stringr, for manipulating strings^[https://en.wikipedia.org/wiki/String_(computer_science)]
-  * forecast for factors (a data structure not used in this book)
+* _ggplot2_, for data visualization
+* _dplyr_, for data manipulation
+* _tidyr_, for data tidying
+* _readr_, for importing data from CSV files
+* _purrr_, for functional programming (such as repetitive functions)
+* _tibble_, for tibbles, a more straightforward way to create data frames
+* _stringr_, for manipulating strings^[https://en.wikipedia.org/wiki/String_(computer_science)]
+* _forcats_ for factors (a data structure not used in this book)
 
 There are several other additional packages in the Tidyverse, and we will use several of them in this book:
-  * httr, for web APIs
-  * jsonlite, for JSON files
-  * readxl, for .xls and .xlsx files. (not used in this book, but useful for those who use Microsoft Excel frequently)
-  * rvest, for web scraping.
-  * xml2, for working with XML formats
+* _httr_, for web APIs
+* _jsonlite_, for JSON files
+* _readxl_, for .xls and .xlsx files. (not used in this book, but useful for those who use Microsoft Excel frequently)
+* _rvest_, for web scraping.
+* _xml2_, for working with XML formats
 
 This book will cover the purpose and functions of these packages as they are needed.
 
@@ -102,28 +87,33 @@ RStudio is also open-source software, which means that the code used to create i
 The RStudio IDE does not come with R; instead, download the latest version of R for your operating system from CRAN^[https://cran.r-project.org/].  Following the download and installation instructions for your operating system to install R.
 
 ### Install the RStudio IDE
-We will use the open-source desktop version of the IDE, which is available as a free download from Posit's website^[https://www.rstudio.com/products/rstudio/download/#download].  On the download page, you should select the correct version of the IDE that matches your operating system (OS).  
+We will use the open-source desktop version of the IDE, which is available as a free download from Posit's website^[https://www.rstudio.com/products/rstudio/download/#download].  On the download page, you should select the correct version of the IDE that matches your operating system (OS).
+
 ![Select the IDE version that matches your operating system](images/ide-download.png)
+
 After selecting the download button, follow the prompts on your computer to install RStudio.
 
 ### Navigating RStudio {#navigate-ide}
 The RStudio IDE brings together all the tools you need to do data science: an editor to write code and text, a console to execute code, access to your computer's terminal, a file explorer, a viewer pane for graphs and visualizations, as well as a version control pane, for those who use Git or Github (more information in the appendix).  While it can accommodate many programming languages, the focus of this book will be using RStudio to code in R.  Within the ecosystem of R tools, it includes common code libraries and other tools, like spellcheck, which make the work of data science much more manageable. 
 
 ![Open the IDE after download](images/rstudio-landing-screen.png)
+
 RStudio has numerous features, but this book covers only some of those.  We'll go over those that are necessary for the tasks at hand.  The left-hand pane is called the console, where we can type code directly, or else the IDE will run code within particular files automatically so we can see a log of our code as it executes.  Additional tabs are in that pane for the terminal (more information in the appendix).  On the top right is the environment pane, where the R objects you create and use in your session are stored.  The bottom right is the files pane, where you can navigate through your computer's file directory.  Other useful tabs in that pane are Help and Viewer, which shows any graphs or plots you create.
 
 RStudio uses the concept of project files, which group together all the code and dataset files for one project.  Every new data science project should start with a new R project in the RStudio IDE.  From the **File** menu, select **New Project** and follow the prompts to create a new project.  Each project must have a name, which will create a folder of the same name and save all your code and other files within that folder.  Naming projects separately keep project files organized and more easily navigable from a file directory.  When you open a project at the start of your work session, the IDE will use the file directory for that project as that session's working directory.  Any files created will be automatically saved to that same directory or folder, helpful in keeping files organized. 
 
 Once you create a file or open one, the console moves to the left bottom, and an editor pane opens in the upper left.  To store some R code as a file to access or re-run later, create a new R Script file by going to File > New File > R Script.
+
 ![Create a new R Script](images/new-r-script.png)
 
 With four panes, the IDE screen looks like this:
+
 ![RStudio IDE with all four panes](images/4-panes.png)
   
 ## Packages needed for this book {#pkgs-download}
 As you progress in your data science journey, you will install more and more R packages.  As with any new project you start, begin by installing all the packages you will need to use.  Please see the appendix for instructions on installing additional software that these packages depend on to function properly (commonly called 'dependencies').  You might see prompts in the console during this process.  If you're asked to install other packages, say 'yes.'  If you're asked if you want to compile binaries from source, say 'no.'  Please see the appendix if you encounter error codes during installation.
 
-```{r packages, eval=FALSE, linewidth=80}
+```{r packages, eval=FALSE}
 lapply(
   c(
     "xfun",
@@ -160,7 +150,6 @@ Let's read some data into R and get more comfortable with RStudio while explorin
 
 After the file is saved, we can use the Tidyverse package _readr_ and its `read.csv()` function to read the file into R and make it available for us to use.  First, we need to load the Tidyverse packages we already installed with the `library()` function.
 ```{r read-stl}
-#load _readr_ as part of the _tidyverse_ package
 library(tidyverse) 
 
 #create an object to store the csv data we read in
@@ -173,17 +162,19 @@ If we want to see the entire file, we can use the `view()` command to open up a 
 ```{r view-covid, eval=FALSE}
 view(stl_covid)
 ```
+
 ![Viewing the stl_covid object in the IDE](images/view-covid.png)
+
 We can also use some built-in base R functions to see snippets of the `stl_covid` dataset.  To see the first ten lines, we can use `head()` and `tail()` to see the last ten lines.  An additional function is `summary()`, which will display summary statistics for each column in the data frame.
-```{r stl-summary, linewidth=70}
+```{r stl-head}
 head(stl_covid)
 ```
 
-```{r}
+```{r stl-tail}
 tail(stl_covid)
 ```
 
-```{r}
+```{r stl-summary}
 summary(stl_covid)
 ```
 
@@ -193,11 +184,15 @@ While this dataset originated as a CSV file, there are specific R packages for r
 This chapter took you from no experience coding in R to interacting with data in the RStudio IDE using R functions.  R is an object-oriented programming language used within RStudio's graphical user interface alongside several popular code packages, such as the Tidyverse.  New users must install R and RStudio before learning the various features the IDE offers for data scientists.  There are several ways to view data in RStudio, whether viewing the entire dataset file or using R functions to see snippets of the dataset within the console.
 
 ## Further Practice {#rstudio-study}
-  * Read in a csv file of your own and run the same summary functions: `head()`, `tail()`, `summary()`
-  * Install _janeaustenR_ for use in chapter 6
+* Read in a csv file of your own and run the same summary functions: `head()`, `tail()`, `summary()`
+* Install _janeaustenR_ for use in chapter 6
 
 ## Additional Resources {#rstudio-resources}
-  * _Hands-on programming with R_, Garrett & Hadley
-  * RStudio IDE, Base R, & data import (_readr_) cheatsheets: https://www.rstudio.com/resources/cheatsheets/
-  * "Getting Started with R and RStudio": https://moderndive.netlify.com/1-getting-started.html
-  * An Introduction to R: https://cran.r-project.org/doc/manuals/R-intro.html
+* _Hands-on programming with R_:
+  https://rstudio-education.github.io/hopr/
+* RStudio IDE, Base R, & data import (_readr_) cheatsheets: 
+  https://www.rstudio.com/resources/cheatsheets/
+* "Getting Started with R and RStudio":     
+  https://moderndive.netlify.com/1-getting-started.html
+* An Introduction to R: 
+  https://cran.r-project.org/doc/manuals/R-intro.html

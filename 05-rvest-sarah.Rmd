@@ -1,7 +1,6 @@
 # Webscraping with _rvest_ {#rvest}
 
-## Learning Objective: use _rvest_ to scrape web page content for analysis. {#rvest-los}
-
+## Learning Objectives{#rvest-los}
 1. Explain how to determine which html tags will provide needed data
 3. Use the _rvest_ package to scrape webpage content into the RStudio IDE
 4. Create a dataset from the scraped content
@@ -35,16 +34,21 @@ Web scraping works by selecting HTML or CSS fields on a webpage and using code t
 To get in contact with each alderman, we need their email.  But to keep our records straight, we also want to know the alderman's name and which ward they represent.  Thus, the metadata fields we need are ward number, alderman name, and alderman email address.
 
 The website listing St. Louis aldermen is https://www.stlouis-mo.gov/government/departments/aldermen/Wards-1-28.cfm.  It lists the 28 city wards and the alderman's name representing that ward.
+
 ![List of St. Louis wards & aldermen](images/wards-aldermen-website.png)
+
 The Wards & Aldermen page provides us with the ward numbers and their representative alderman, but it does not list the alderman's email address.  Both the ward number and the alderman name are hyperlinks to the same alderman's webpage.  
 
 ![Ward 1 Alderman Sharon Tyus' main webpage](images/sharon-tyus.png)
+
 The individual alderman websites do provide the alderman's email address, physical address, and phone number.  From these pages, we can anticipate two stages to our web scraping.  First, we'll need to scrape the list of wards and aldermen.  Then we'll need to scrape each alderman's webpage for their email address.
 
 Before we get started coding, we need to determine the CSS tags, or selectors, that we need to scrape.  To do that, we'll utilize a tool called Selector Gadget^[https://selectorgadget.com/], which is available as a Chrome^[https://www.google.com/chrome/] browser extension, to expose and identify CSS tags on the data we need.   The _rvest_ website^[https://rvest.tidyverse.org] recommends SelectorGadget.
 
 After installing Chrome and SelectorGadget, we navigate to https://www.stlouis-mo.gov/government/departments/aldermen/Wards-1-28.cfm and click SelectorGadget from the Chrome extensions menu.  Once SelectorGadget is engaged, we click on the content we want to scrape (any ward number or alderman name).  SelectorGadget highlights the content and provides the CSS selector to scrape in the dialog box at the bottom of the browser.  If SelectorGadget highlights more fields than what we want, we'll click on the extraneous elements to deselect them.  Once finished, SelectorGadget will display the selector we need to use with _rvest_.  We'll need to repeat this for each page and element we need.
+
 ![SelectorGadget on the Wards & Alderman webpage](images/aldermen-selectorgadget.png)
+
 To scrape the aldermen's names and ward numbers, we need the CSS selector `.data a`.
 
 ## Web scraping part 1: wards & aldermen {#scraping1}
@@ -53,7 +57,10 @@ To scrape the aldermen's names and ward numbers, we need the CSS selector `.data
 
 First, we will use the `read_html()` function to read the webpage we want to scrape. Our second step is to save that scraped webpage in an HTML file so that we can access it later.
 ```{r scrape}
-scrape <- read_html("https://www.stlouis-mo.gov/government/departments/aldermen/Wards-1-28.cfm")
+scrape <- read_html(
+  "https://www.stlouis-mo.gov/government/departments/aldermen/Wards-1-28.cfm"
+)
+
 write_html(scrape, "scrape.html")
 ```
 
@@ -79,7 +86,10 @@ We'll need to use two new operators to select the even and odd rows separately: 
 ward_num <- wards %>%
   filter(row_number() %% 2 == 1) %>% # odd rows
   tibble() %>%
-  rename(Ward = names(.)) # here the '.' can be read as "the current object, created in the previous line"
+  rename(Ward = names(.))
+
+# the '.' can be read as "the current object,
+# created in the previous line"
 ```
 
 Additionally, we'll rename the columns with a blank header using the dplyr `rename()` function, because columns without header rows are hard to work with and hard to remember what's inside that column.  When using `rename()` we need to pass the function two pieces of information: the data and the new column name.  However, since we are using the pipe to combine functions, the data isn't an object we can reference so we need a workaround.  The argument we'll pass to `rename()` here is the new name and we'll say that it is equal to the name that is currently called `.` using the `base::names()` function, which R recognizes applies to the name of a list or vector.  
@@ -89,12 +99,15 @@ While this explanation is a little long, this code is more efficient than creati
 alderman <- wards %>%
   filter(row_number() %% 2 == 0) %>% # even rows
   tibble() %>%
-  rename(Alderman = names(.)) # rename the Alderman column, which has a blank header
+  rename(Alderman = names(.)) 
+# rename the Alderman column, which has a blank column name
 ```
 
 Finally, the column bind function, `base::cbind()`, will let us bind the objects for alderman names and ward numbers together into one table, where each vector becomes a column in the table:
 ```{r ewar-cbind}
-wards_alderman <- cbind(ward_num, alderman) # combine the two columns together into one tibble
+wards_alderman <- cbind(ward_num, alderman)
+# combine the two columns together into one tibble
+
 head(wards_alderman)
 ```
 We now have a tidy dataset where each observation includes the ward number and that ward's alderman.
@@ -140,7 +153,7 @@ websites
 We've come far enough that it makes sense to combine the objects we have into a single table.  Again, we'll use the column bind function to combine the objects we have so far into one table:
 ```{r vector-bind}
 all_urls <- cbind(wards_alderman, websites)
-# now we have a table of ward, alderman name, and link to their individual bio page
+# one table of ward, aldermen, and links to their webpages
 ```
 
 ### Automating tedious scraping
@@ -160,6 +173,7 @@ vector_urls <- as.vector(all_urls[[3]])
 1. Scrape aldermen email addresses 
 
 Before scraping email addresses for each alderman, we must determine which CSS selector we need to scrape.  Using SelectorGadget as we did before, we see that each alderman's email address uses the `strong+ a` selector.
+
 ![Alderwoman Middlebrook's contact page](images/middlebrook-email.png)
 
 We are now ready to automate scraping each alderman's website for their email address.  First, we will use `map()` to read in the HTML for each element of our vector of alderman website URLs.  Then we will use `map()` again to scrape the CSS selector `strong+ a` from the HTML we read for each site.  

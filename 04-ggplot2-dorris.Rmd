@@ -57,7 +57,6 @@ unemployment_data <- read_csv("data/unemployment_data.csv")
 
 We'll also recreate the high and low unemployment objects we used in chapter 3.
 ```{r high-low}
-# Arrange by descending unemployment rate and get the ten highest unemployment rates
 high_unemploy <- unemployment_data %>%
   arrange(desc(unemployment_rate)) %>%
   head(n = 10)
@@ -95,7 +94,11 @@ Let's clean up these labels and add a title for the two plots. We do this throug
 
 ```{r high-plot}
 high_unemp_plot <- high_unemp_plot +
-  labs(title, "Ten census tracts with the highest unemployment rate", x = "Unemployment Rate", y = "Census Tract")
+  labs(
+    title, "Ten census tracts with the highest unemployment rate",
+    x = "Unemployment Rate",
+    y = "Census Tract"
+  )
 
 high_unemp_plot
 ```
@@ -103,7 +106,11 @@ high_unemp_plot
 We will also do the same for low_unemp_plot.
 ```{r low-plot}
 low_unemp_plot <- low_unemp_plot +
-  labs(title = "Ten census tracts with the lowest unemployment rate", x = "Unemployment Rate", y = "Census Tract")
+  labs(
+    title = "Ten census tracts with the lowest unemployment rate", 
+    x = "Unemployment Rate", 
+    y = "Census Tract"
+    )
 
 low_unemp_plot
 ```
@@ -112,7 +119,10 @@ Now that we have the top ten Census block groups with the highest and lowest une
 
 ```{r low-female-jobs}
 low_unemployment_female_plot <- female_low_unemployment %>%
-  ggplot(aes(x = total, y = reorder(female_jobs, total))) +
+  ggplot(aes(
+    x = total,
+    y = reorder(female_jobs, total)
+  )) +
   geom_col()
 
 low_unemployment_female_plot
@@ -122,7 +132,10 @@ As we did in the previous set of plots, we created a variable called `low_unempl
 
 ```{r low-male-jobs}
 low_unemployment_male_plot <- male_low_unemployment %>%
-  ggplot(aes(x = total, y = reorder(male_jobs, total))) +
+  ggplot(aes(
+    x = total,
+    y = reorder(male_jobs, total)
+  )) +
   geom_col()
 
 low_unemployment_male_plot
@@ -133,8 +146,9 @@ Now we will add a title and x and y axis label layer to the two plots through `+
 ```{r low-female-labels}
 low_unemployment_female_plot <- low_unemployment_female_plot +
   labs(
-    title = "Top ten female occupations in census tracts with lowest unemployment",
-    x = "Total", y = "Occupation"
+    title = "Top female jobs in areas with low unemployment",
+    x = "Total", 
+    y = "Occupation"
   )
 
 low_unemployment_female_plot
@@ -143,8 +157,9 @@ low_unemployment_female_plot
 ```{r low-male-labels}
 low_unemployment_male_plot <- low_unemployment_male_plot +
   labs(
-    title = "Top ten male occupations in census tracts with lowest unemployment",
-    x = "Total", y = "Occupation"
+    title = "Top male jobs in areas with low unemployment",
+    x = "Total", 
+    y = "Occupation"
   )
 
 low_unemployment_male_plot
@@ -159,9 +174,10 @@ If you want to plot data by a particular categorical variable, you can use facet
 One way in which we can create facets through the `facet_wrap()` function. Use this function when you want to facet one variable [wickham2016]. Let's look at the life expectancy (lifeExp) vs. GDP per capita (gdpPercap) by decade from 1957 to 2007. Before we can start faceting, we must to get the data.
 
 ```{r gapminder-variable}
-# saving the gapminder data into a variable.
+# saving the gapminder data 
 gapminder_data <- gapminder
-# separating the gapminder data by decade from 1957 to 2007.
+
+# separating the gapminder data by decade
 gapminder_decade_data <- gapminder_data %>%
   filter(year %in% c(1957, 1967, 1977, 1987, 1997, 2007))
 ```
@@ -226,8 +242,9 @@ Scales change how the plot looks. Changing the scales, such as the minimum and m
 low_unemployment_female_plot <- low_unemployment_female_plot +
   scale_x_continuous(breaks = seq(1000, 7000, by = 1000)) +
   labs(
-    title = "Top ten female occupations in census tracts with lowest unemployment",
-    x = "Total", y = "Occupation"
+    title = "Top female jobs in areas with low unemployment",
+    x = "Total", 
+    y = "Occupation"
   )
 
 low_unemployment_female_plot

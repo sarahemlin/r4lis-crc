@@ -1,6 +1,6 @@
 # Using _tidymodels_ to Understand Machine Learning {#tidymodels}
 
-## Learning Objective: recognize the various processing and analysis functions of machine learning using the tidymodels package. {#ml-los}
+## Learning Objectives {#ml-los}
 
 1. Recall the steps in machine learning and the correlating _tidymodels_ packages. 
 2. Describe the ways text mining is used in machine learning algorithms.
@@ -8,8 +8,8 @@
 4. Identify areas of potential bias in machine learning.
 
 ## Terms You'll Learn {#ml-terms}
-  * machine learning
-  * algorithm
+* machine learning
+* algorithm
 
 ## Scenario {#ml-scenario}
 Job seekers with whom you've worked at the library report many resumés submitted but few callbacks.  You've heard many companies use resumé screening software, but you'd like to understand how that works and how it affects hiring.  If there's a negative effect, you want to prepare the program participants with knowledge of how to navigate the reality of machine learning in the job application process.
@@ -20,7 +20,7 @@ library(tidymodels)
 ```
 
 ## Introduction {#ml-intro}
-This chapter is a brief introduction to machine learning, but unlike the rest of the book, this chapter will stay reasonably high level and not include any coding.  Machine learning code requires knowledge of advanced mathematics (linear algebra); while learning to do machine learning is possible, the background knowledge and theory behind the steps covered in this chapter require in-depth explanations beyond the scope of this work.  Learning or re-learning linear algebra takes time.  However, there is still a significant benefit from understanding the process, even if you can't replicate it on your own (yet).  You can still benefit from knowing the process to better interact with ML in your work and assist your library users.
+This chapter is a brief introduction to machine learning (ML), but unlike the rest of the book, this chapter will stay reasonably high level and not include any coding.  Machine learning\index{machine learning} code requires knowledge of advanced mathematics (linear algebra); while learning to do machine learning is possible, the background knowledge and theory behind the steps covered in this chapter require in-depth explanations beyond the scope of this work.  Learning or re-learning linear algebra takes time.  However, there is still a significant benefit from understanding the process, even if you can't replicate it on your own (yet).  You can still benefit from knowing the process to better interact with ML in your work and assist your library users.
 
 The benefits of learning ML is closely related to its ubiquity in our lives.  It powers many applications and systems  that librarians and library users rely on for professional and personal work.  Professionally, we see ML in predictive search and the search results of discovery systems and research databases we use and maintain daily.  In our personal lives, our search engines queries, shopping, media platforms, and social media are all powered by ML, as are many civic (government services eligibility, job applications) and financial services (credit scores, loan approvals) we interact with regularly.
 
@@ -77,13 +77,13 @@ Resumé screening algorithms utilize text mining and apply machine learning to w
 
 These algorithms use words that appear in "successful" applications with current applications.  Yet if a company has hired many people who are similar in name, education, or background, then the algorithm will predict that only people like them will be successful.  Because we believe computers are objective, algorithms are often undisputed, and our decisions encode the disparities and inequities in our current environment.  The lexicons used in textual machine learning are of particular concern because models trained on lexicons that originated from crawling the internet can have word associations that reflect the worst parts of our culture to us.  Hazardous word associations can manifest in automated restaurant reviews that consistently demote Mexican restaurants because the training data contained a strong word association between "Mexican" and "illegal," a term with a negative connotation that carries over to what the algorithm associates as a related word [@shane2019].  While we can't say if a particular algorithm is making negative associations where it shouldn't be, we know that using lexicons based on the internet is popular because the internet holds a vast number of words, and crawling it to create a dataset is free.
 
-## Summary {#ml-summary}
+##  Summary {#ml-summary}
 Machine learning is ubiquitous, but we need to understand how it works because it's so intertwined with our personal and professional lives.  Supervised machine learning uses data to fit a model that predicts results, where people decide to set sample sizes, set model parameters, and adjust the model's fit.  Because people make the data and they make the algorithms, they are both fallible, and placing blind faith in algorithmic predictions as "truth" is unwarranted.  There are many places where bias can creep into an ML algorithm, making it critical that we probe the origins of the analyzed data and unpack assumptions therein.
 
-## Further Practice {#ml-study} 
+##  Further Practice {#ml-study} 
   * Work through the examples in each chapter of _Supervised machine learning for text analysis in R_ by Emily Hvitfeldt & Julia Silge: https://smltar.com/
 
-## Additional Resources {#ml-resources}
+##  Additional Resources {#ml-resources}
   * Tidymodels website: https://tidymodels.org
   * _You look like a thing and I love you_ by Janelle Shane
   * _Masked by trust_ by Matthew Reidsma

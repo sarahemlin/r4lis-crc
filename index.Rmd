@@ -36,7 +36,7 @@ Access to a personal computer (desktop or laptop) with permission to install pro
 
 We used the _knitr_ package and the _bookdown_ package to compile this book. Our R session information is shown below:
 
-```{r, linewidth=60}
+```{r}
 xfun::session_info()
 ```
 

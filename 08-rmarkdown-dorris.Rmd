@@ -1,6 +1,6 @@
 # Creating Dynamic Documents with _rmarkdown_ {#rmarkdown}
 
-## Learning Objective: Compose a dynamic document using the _rmarkdown_ package.  After you finish this chapter, you will be able to perform the following steps to create an R Markdown document: {#rmarkdown-los}
+## Learning Objectives {#rmarkdown-los}
 
 1.  Reproduce markdown syntax.
 2.  Use appropriate code to load data and relevant libraries in RStudio.
@@ -57,6 +57,7 @@ output: html_document
 ---
 
 ```
+
 ![Metadata information](images/rmarkdown_1.png)
 
 This default YAML indicates the title, author, date, and output type.  There are a variety of output options that you can designate in the YAML header.  For example, in the above code, we specified the output as an HTML document.  There are various output options, such as a PDF, Word, or PowerPoint presentation^[https://bookdown.org/yihui/rmarkdown/output-formats.html]. You can also customize your R Markdown document using templates which we will discuss later in this chapter.
@@ -129,8 +130,9 @@ low_unemployment_female_plot <- female_low_unemployment %>%
   ggplot(aes(x = total, y = reorder(female_jobs, total))) +
   geom_col() +
   labs(
-    title = "Top ten female occupations in census tracts with lowest unemployment",
-    x = "Total", y = "Occupation"
+    title = "Top 10 female jobs in areas with low unemployment",
+    x = "Total",
+    y = "Occupation"
   )
 
 low_unemployment_female_plot
@@ -141,7 +143,10 @@ You can also embed maps into your R Markdown document.  As with the code chunk b
 ```{r, echo=TRUE}
 tm_shape(stl_wards, unit = "mi") +
   tm_polygons() +
-  tm_layout(title = "Wards in St. Louis City", title.size = .7) +
+  tm_layout(
+    title = "Wards in St. Louis City",
+    title.size = .7
+  ) +
   tm_scale_bar(position = c("right", "bottom"), width = .3) +
   tm_compass(position = c("left", "top"))
 ```
@@ -153,6 +158,7 @@ You know how to add stylistic elements and code to your RMarkdown document, but 
 ![PDF output showing the code  St. Louis wards map](images/pdf_output1.png)
 
 ![PDF output showing the map of St. Louis wards](images/pdf_output2.png)
+
 **Knit to HTML**
 ![HTML document showing a map of St. Louis wards and the code that created the map](images/html_output.png)
 
@@ -178,6 +184,7 @@ output:
 ![](images/pretty_doc_1.png)
 
 ![](images/pretty_doc_2.png)
+
 ## Summary {#rmd-summary}
 R Markdown is a way to create various types of documents in RStudio.  Using the Markdown language, it can be used to format plain text documents.  An R Markdown document comprises a YAML header containing the metadata, R Markdown syntax allowing you to add stylistic elements in the document, and code chunks.  When adding code chunks, you can choose whether to display the code chunks along with the output.  After creating your R Markdown document, you can create a Word, PDF, or HTML document through knitting.  Knitting converts R Markdown into the output format designated in the YAML header.
 

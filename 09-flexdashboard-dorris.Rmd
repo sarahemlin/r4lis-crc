@@ -1,6 +1,6 @@
 # Creating a flexdashboard {#flexdashboard}
 
-## Learning Objective: To create a simple flexdashboard to display data visualizations and tabular data. {#flexdashboard-los}
+## Learning Objectives {#flexdashboard-los}
 
 1. Define a flexdashboard and the basic functionality of a flexdashboard.
 2. Generate an R Markdown document with flexdashboard as the output format.
@@ -38,6 +38,7 @@ We are also going to load the data that we used in the previous chapters.  This 
 aldermen_info <- read_csv("data/aldermen-contact.csv")
 male_low_unemployment <- read_csv("data/male-low-unemployment.csv")
 female_low_unemployment <- read_csv("data/female-low-unemployment.csv")
+
 stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp")
 stl_tracts <- st_read("unemployment_tract/unemployment_tract.shp") %>%
   rename("unemployment_rate" = "unmply_") %>%

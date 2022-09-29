@@ -31,6 +31,7 @@ library(shiny)
 aldermen_info <- read_csv("data/aldermen-contact.csv")
 male_low_unemployment <- read_csv("data/male-low-unemployment.csv")
 female_low_unemployment <- read_csv("data/female-low-unemployment.csv")
+
 stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp")
 stl_tracts <- st_read("unemployment_tract/unemployment_tract.shp") %>%
   rename("unemployment_rate" = "unmply_") %>%
@@ -45,7 +46,7 @@ In short, _shiny_ is a package that allows you to create interactive web applica
 
 Shiny apps are composed of three parts, which are the user interface (UI), the server, and the `shinyApp` function. The UI is what the user will see on the front end and it is where you build the look of the app. In the UI, you can add various elements that will allow the user to interact with the app such as buttons, sliders, and drop down menus along with the display of your data visualization or data table. On the back end, the server controls what the app will do.  For example, it handles what happens when a user interacts with the app such as pressing a button. The interaction between the UI and server is based on reactivity in which the outputs update based on the input [@wickham2021]. This concept of reactivity will become more clear as we build our app. To put these both together, so you can deploy your app you need to call the `shinyApp` function. Let's first create shiny apps of each component of the dashboard, and then we will integrate these apps in the Flexdashboard that you created. 
 
-## Creating a Shiny web map app {shiny-map-app}
+## Creating a Shiny web map app {#shiny-map-app}
 
 ###  Initalizing from RStudio
 In RStudio, you can create a Shiny app by going to File > Shiny Web App. You will be prompted to give an application name and application type. Name the app "stl_web_map" and select the Single File (app.R) type since we are creating a small app. The Multiple File(ui.R/server.R) type is best when you are creating larger shiny apps^[https://shiny.rstudio.com/articles/two-file.html]. To get started, we need to create the user interface and the server functions.
@@ -65,11 +66,20 @@ Initially, the output will be blank since we haven't added any elements.  One we
 
 ```{r shiny_ui, eval=FALSE}
 
-layers <- c("Select a variable", "Unemployment rate by ward", "St. Louis Wards")
+layers <- c(
+  "Select a variable",
+  "Unemployment rate by ward",
+  "St. Louis Wards"
+)
 
 # creating the ui
 ui <- fluidPage(
-  selectInput("var", "St. Louis Maps", choices = layers, selected = layers[1])
+  selectInput(
+    "var",
+    "St. Louis Maps",
+    choices = layers,
+    selected = layers[1]
+  )
 )
 
 # creating the server
@@ -86,11 +96,20 @@ Next, we will create the back-end functionality of the app in the server. First,
 
 ```{r shiny_server, eval= FALSE}
 
-layers <- c("Select a variable", "Unemployment rate by ward", "St. Louis Wards")
+layers <- c(
+  "Select a variable",
+  "Unemployment rate by ward",
+  "St. Louis Wards"
+)
 
 # creating the ui
 ui <- fluidPage(
-  selectInput("var", "St. Louis Maps", choices = layers, selected = layers[1])
+  selectInput(
+    "var",
+    "St. Louis Maps",
+    choices = layers,
+    selected = layers[1]
+  )
 )
 
 # creating the server
@@ -115,11 +134,20 @@ The next thing we are going to do is add reactivity to the app by adding the `ob
 
 ```{r reactivity, eval= FALSE}
 
-layers <- c("Select a variable", "Unemployment rate by ward", "St. Louis Wards")
+layers <- c(
+  "Select a variable",
+  "Unemployment rate by ward",
+  "St. Louis Wards"
+)
 
 # creating the ui
 ui <- fluidPage(
-  selectInput("var", "St. Louis Maps", choices = layers, selected = layers[1])
+  selectInput(
+    "var",
+    "St. Louis Maps",
+    choices = layers,
+    selected = layers[1]
+  )
 )
 
 # creating the server
@@ -166,7 +194,9 @@ shinyApp(ui = ui, server = server)
 
 Let's break down the `observeEvent` function. As mentioned before, the `observeEvent` function will change the output based on the input. Each visualization has a different way of doing this. In the case of _tmap_, the `tmapProxy` function will update the map once various conditions are met. If the user selects the "Unemployment rate by ward" selection (layers[2]), then the `tmapProxy` function will delete the previously displayed layer and add the "Unemployment rate by ward" layer. If the user selects the "St. Louis Wards" (layers[3]) option, then the `tmapProxy` will update the map to show that layer. The way the layer is removed is through calling the z-index of the layer that is being displayed, which is 401 in this case.
 
-We are done creating this app! Run it to see what it looks like. ![St. Louis Ward Maps Shiny app showing rates of unemployment](images/shiny_app3.png)
+We are done creating this app! Run it to see what it looks like. 
+
+![St. Louis Ward Maps Shiny app showing rates of unemployment](images/shiny_app3.png)  
 
 ![St. Louis Ward Maps Shiny app showing St. Louis Wards](images/shiny_app4.png)
 
@@ -177,11 +207,20 @@ We are not going to go step by step with this app, because the steps are the sam
 
 ```{r shiny_server2, eval= FALSE}
 
-stl_plot_choices <- c("Choose a plot", "Occupations with the lowest unemployment (female)", "Occupations with the lowest unemployment (male)")
+stl_plot_choices <- c(
+  "Choose a plot",
+  "Occupations with the lowest unemployment (female)",
+  "Occupations with the lowest unemployment (male)"
+)
 
 # creating the ui
 ui <- fluidPage(
-  selectInput("plots", "Plots", choices = stl_plot_choices, selected = stl_plot_choices[1])
+  selectInput(
+    "plots",
+    "Plots",
+    choices = stl_plot_choices,
+    selected = stl_plot_choices[1]
+  )
 )
 
 # creating the server
@@ -189,11 +228,15 @@ server <- function(input, output) {
   # this is the plot that will load
   plotOutput("plot")
   output$plot <- renderPlot({
-    ggplot(female_low_unemployment, aes(x = total, y = reorder(female_jobs, total))) +
+    ggplot(female_low_unemployment, aes(
+      x = total,
+      y = reorder(female_jobs, total)
+    )) +
       geom_col() +
       labs(
-        title = "Top ten female occupations in census tracts with lowest unemployment",
-        x = "Total", y = "Occupation"
+        title = "Top 10 female jobs in areas with low unemployment",
+        x = "Total",
+        y = "Occupation"
       )
   })
 
@@ -206,8 +249,10 @@ server <- function(input, output) {
         )) +
           geom_col() +
           labs(
-            title = "Top ten female occupations in census tracts with lowest unemployment",
-            x = "Total", y = "Occupation"
+            title = "Top 10 female jobs in areas with low 
+              unemployment",
+            x = "Total",
+            y = "Occupation"
           )
       })
     }
@@ -217,8 +262,10 @@ server <- function(input, output) {
         ggplot(male_low_unemployment, aes(x = total, y = reorder(male_jobs, total))) +
           geom_col() +
           labs(
-            title = "Top ten male occupations in census tracts with lowest unemployment",
-            x = "Total", y = "Occupation"
+            title = "Top 10 male jobs in areass with low 
+              unemployment",
+            x = "Total",
+            y = "Occupation"
           )
       })
     }
@@ -236,9 +283,11 @@ Now that we are finished with this app, run the app to see how it looks.
 
 ![Plot of occupations with the lowest unemployment(female)](images/shiny_app7.png)
 
+
 ![Plot of occupations with the lowest unemployment (male)](images/shiny_app8.png)
 
-## Integrating Shiny apps into a FlexDashboard {integrating-shiny}
+
+## Integrating Shiny apps into a FlexDashboard {#integrating-shiny}
 
 Now we are going to put these Shiny apps into the FlexDashboard that we created in the previous chapter. We will do this by putting the UI function in the sidebar and putting the server function in the second column that shows our output. First, we will do it with the Shiny mapping app. Let's put the UI in the sidebar of the St. Louis Ward Maps page:
 
@@ -282,10 +331,10 @@ We will not make any changes to the Alderman page.
 
 Congratulations, you have created a FlexDashboard which integrates Shiny apps!  You can refer to the `stl_dashboard_shiny.Rmd` file to see the finished product.
 
-# Summary {#shiny-summary}
+## Summary {#shiny-summary}
 The _shiny_ package allows you to create interactive web applications. The foundation of Shiny applications is based on reactivity in which the output will update based on the input. The two components of a Shiny app is the user interface, known as the UI and the server. The UI which displays the various elements such as selection bars, plots, maps, or tables, while the server manages the functionality of the app in terms of reactivity. We updated our flexdashboard to include various Shiny apps such as a map with drop-down menus to display either St. Louis wards or unemployment rate by ward. In addition, we added a Shiny app of a plot which also has a drop-down menu of displaying occupations in Census tracts that has the lowest unemployment by male and female occupations. We left the data table for the aldermen information unchanged.
 
-# Further practice {#shiny-study}
+## Further practice {#shiny-study}
   * Shiny can become complicated really fast, and one of the best ways to become acquainted with Shiny is to see some examples of Shiny apps. Read Using Shiny with FlexDashboard^[https://rstudio.github.io/flexdashboard/articles/shiny.html], look at some of the Example projects^[https://rstudio.github.io/flexdashboard/articles/examples.html], and explore the source code. From these examples, what else could you envision adding on to the dashboard?
 
 ## Resources {#shiny-resources} 

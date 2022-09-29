@@ -1,7 +1,6 @@
 # Textual Analysis with _tidytext_ {#tidytext}
 
-## Learning Objective: analyze text analytics with the _tidytext_ package. {#tidytext-los}
-
+## Learning Objectives {#tidytext-los}
 1. Describe a use case for text mining
 2. Use the tidytext package to load a textual dataset into the IDE
 3. Tokenize a textual dataset
@@ -54,6 +53,7 @@ Accessing the article database through its API is not the only way to access tha
 
 ###  Set up developer account {#dev-account}
 Each user must have a developer account to access the NYT article database via API.  Our first step is to access http://developer.nytimes.com and create an account.  After creating your account, log in and select "Get Started" to begin the process of creating an API key, which is a code unique to you that authorizes access to the NYT articles database.
+
 ![NYT Developer Network homepage](images/nyt-api-get-started.png)
 
 ### Create an app {#create-app}
@@ -108,7 +108,8 @@ baseurl <- paste0(
 
 When using the API, each search results page contains ten records per page, and the API will only return one page of results at a time, no matter how many total pages the search returns.  However, the ten records included on one page of search results will not provide enough data for text analysis so we will need many more than just one page.  To balance the need for a large dataset without taking too long to process the data, we will retrieve output for 25 pages of search results.  Before we run the query, we need to create an object that will store all of our API output.
 ```{r nyt-vector}
-pages <- vector("list", length = 25) # 25 pages is 250 articles
+pages <- vector("list", length = 25) 
+# 25 pages is 250 articles
 ```
 
 3. Retrieve 25 pages of search results
@@ -134,10 +135,15 @@ One characteristic of JSON data, which is used frequently in websites and web ap
 In the sequence below, _i_ is a placeholder for each page number.  We see this in two places, the for-loop as well in the output, where we want to create an object from each page (page _i_ in pages 1-25).  Also, there's a limit of 10 requests per minute for NYT API calls.  Since we have 25 calls to make, we must pause for 6 seconds between page calls.
 
 ```{r api-call, cache = TRUE}
-for (i in 1:25) { # can be read as "for every page number from 1 to 25"
-  nytSearch <- fromJSON(paste0(baseurl, "&page=", i), flatten = TRUE) %>% data.frame() # _body_
+for (i in 1:25) {
+  # can be read as "for every page number from 1 to 25"
+  nytSearch <- fromJSON(paste0(baseurl, "&page=", i),
+    flatten = TRUE
+  ) %>% data.frame() # _body_
   pages[[i]] <- nytSearch # _output_
-  Sys.sleep(6) # there's a limit of 10 requests per minute for API calls so we must pause for 6 seconds before initiating the next call
+  Sys.sleep(6)
+  # there's a limit of 10 requests per minute for API calls
+  # we must pause for 6 seconds before initiating the next call
 }
 ```
 
@@ -146,7 +152,8 @@ Our for-loop returned data that needs a little tidying before using it.  We have
 
 1. First, we need to stitch each of the 25 pages of search results into one data frame.
 ```{r rbind-json}
-articles_json <- rbind_pages(pages) # combining 25 outputs into one dataframe
+articles_json <- rbind_pages(pages) 
+# combining 25 outputs into one dataframe
 ```
 
 2. We need to pull out the four text-rich metadata fields for our analysis: abstract, snippet, lead paragraph, and headline.  We need to view the metadata field names to ensure that we combine the correct column names.
@@ -158,8 +165,8 @@ From the list of column names, we can see the specific field syntax we need.  Ou
 3. We'll create a new object that is a data frame of only the four text columns we want to use.
 ```{r select-fields}
 text_fields <- articles_json %>%
-  dplyr::select(c(
-    response.docs.abstract, response.docs.snippet, # select() is a _dplyr_ function
+  dplyr::select(c( # select() is a _dplyr_ function
+    response.docs.abstract, response.docs.snippet, 
     response.docs.lead_paragraph, response.docs.headline.main
   ))
 ```
@@ -229,10 +236,12 @@ As you remove stop words, however, be aware that what's considered a stop word c
 ### Remove stop words from the words object {#remove-stopwords}
 The _tidytext_ package comes with a stop words dataset that we can load and run against our words dataset.  We'll use a join from the _dplyr_ chapter; in this case, we want to use `anti_join()`, which will remove any values that appear in both the words & stop_words datasets.  This way, any word in the stop words list that appears in our dataset will be removed, along with words that have no match.  An anti_join must match on columns with the same name.  The stop_words dataset has a column named word, and we renamed one of columns in the previous step to word also, so now our anti-join will work.
 ```{r load-stopwords,}
-data("stop_words") # loads the stop words set from _tidytext_
+data("stop_words") 
+# loads the stop words set from _tidytext_
 
 tidy_words <- words %>%
-  anti_join(stop_words) # using a _dplyr_ join, remove stop words found in the words dataset
+  anti_join(stop_words) 
+# using a _dplyr_ join, remove stop words found in the words dataset
 ```
 
 ## Sentiment analysis {#sentiment-analysis}
@@ -281,11 +290,14 @@ This lists all the words in the dataset with a count of how many times each word
 ### Identify the text’s most common words {#term-frequency}
 Once we have a count of each term's frequency in the overall dataset, we are able to perform the tf-idf calculation to determine which words are most important. 
 ```{r rank frequency}
-rank_frequency <- word_counts %>% # take our list of words, minus stop words
+rank_frequency <- word_counts %>% 
+  # take our list of words, minus stop words
   mutate(
-    rank = row_number(), # add a new column called rank, which writes the row number for that row
+    rank = row_number(), 
+    # add a new column called rank (the row number for that row)
     term_frequency = n / 12731
-  ) # add a new column called term frequency, which calculates the frequency for each term by dividing the total number of count of observations in tidy_words dataset (12731) by the count of each word
+  ) 
+
 print(rank_frequency)
 ```
 
@@ -296,10 +308,16 @@ The new column `term_frequency`, is a calculated field because it is derived fro
 Making a plot to show term frequencies is a way to ensure that the textual dataset has a normal distribution.  Due to Zipf's Law, a 'normal' distribution here would be a constant negative slope; the straight line should be higher on the left and lower on the right.  However, when we look at the `term_frequency` column in the preceding step, we notice that the numbers start small and then get progresively smaller.  If we made a plot of this data as-is, it would not follow the bell-curve of what statisticians call a 'normal distribution.'  In cases like these, a data scientist might want to transform the entire dataset by taking the log(x) of each value.  We'll apply a logarithmic scale to both our x and y axis with the `scale_*_log10()` functions in our `ggplot()` function call:
 ```{r plot-frequency}
 rank_frequency %>%
-  ggplot(aes(rank, term_frequency, color = word)) + # note that when you start your ggplot2 code, each line is ended with a `+` instead of the pipe
-  geom_line(group = 1, size = 1.1, alpha = 0.8, show.legend = FALSE) +
-  scale_x_log10() + # we're using a logarithmic scale on both axis to show the constant negative slop
+  ggplot(aes(rank, term_frequency, color = word)) +
+  geom_line(
+    group = 1,
+    size = 1.1,
+    alpha = 0.8,
+    show.legend = FALSE
+  ) +
+  scale_x_log10() +
   scale_y_log10()
+# we're using a logarithmic scale on both axis to show the constant negative slop
 ```
 Plotted above, we can see that our textual dataset conforms to Zipf's Law, which validates the normalcy of our dataset and the other conclusions we have drawn about it.  By transforming our original skewed, long-tail dataset we were able to create a linear relationship and display the constant negative slope. This highlights the inverse relationship between word frequency and meaning. 
 
@@ -313,7 +331,7 @@ This chapter covered the basics of what text mining, sentiment analysis, and tf-
 
 ## Additional Resources {#text-resources}
 
-  * Text Mining in R (Julia Silge & David Robinson)
+  * _Text Mining in R_: https://www.tidytextmining.com/
   * Digital Humanities resources:
     + earlyprint.org: "The EarlyPrint Lab offers a range of tools for the computational exploration and analysis of English print culture before 1700"
     + americaspublicbible.org
