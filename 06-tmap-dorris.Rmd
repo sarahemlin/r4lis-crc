@@ -46,7 +46,7 @@ There are two types of spatial data: vector data and raster data. **Vector data*
 ```{r lines, echo = FALSE, eval=FALSE}
 stl_streets <- st_read("streets/TgrGeoCd.shp")
 tmap_mode("view")
-tm_shape(stl_streets)+
+tm_shape(stl_streets) +
   tm_lines()
 ```
 ![St. Louis streets](tmap-images/lines.png)
@@ -54,7 +54,7 @@ tm_shape(stl_streets)+
 ```{r points, echo = FALSE, eval=FALSE}
 stl_stops <- st_read("Metro_St._Louis_MetroBus_Stops_By_Line/Metro_St._Louis_MetroBus_Stops_By_Line.shp")
 tmap_mode("view")
-tm_shape(stl_stops)+
+tm_shape(stl_stops) +
   tm_dots()
 ```
 ![St. Louis Metro bus stops by line](tmap-images/points.png)
@@ -63,7 +63,7 @@ footnote^[https://data-metrostl.opendata.arcgis.com/datasets/current-metrobus-me
 ```{r polygons, echo = FALSE, eval=FALSE}
 stl_parks <- st_read("parks/parks.shp")
 tmap_mode("view")
-tm_shape(stl_parks)+
+tm_shape(stl_parks) +
   tm_polygons(col = "green")
 ```
 ![Parks in St. Louis](tmap-images/polygons.png)
@@ -94,9 +94,8 @@ This shapefile does not have a projection. Let's see what another shapefile look
 ```{r unprojected-2, echo = FALSE, eval=FALSE}
 us <- st_read("us_state_clip/us.shp")
 tmap_mode("plot")
-tm_shape(us)+
+tm_shape(us) +
   tm_polygons()
-
 ```
 ![caption](tmap-images/unprojected-2.png)
 
@@ -106,11 +105,10 @@ To change the projection, we will have to use `st_transform()` and we will use t
 
 
 ```{r projected, eval=FALSE}
-us_project <- us %>% st_transform(crs = 2163) 
+us_project <- us %>% st_transform(crs = 2163)
 tmap_mode("plot")
-tm_shape(us_project)+
+tm_shape(us_project) +
   tm_polygons()
-
 ```
 ![caption](tmap-images/projected.png)
 
@@ -132,10 +130,10 @@ The type of spatial data that we will be working with is called a **shapefile**.
 
 We will need to use `st_read()` function from the _sf_ package to load the shapefile into RStudio. After that, we will use the `st_crs()` function to see if the shapefile has a coordinate system. We are also going to read the unemployment_tract shapefile that was created in the previous chapter.
 ```{r stl_data}
-stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp") 
-stl_tracts <- st_read("unemployment_tract/unemployment_tract.shp")%>%
+stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp")
+stl_tracts <- st_read("unemployment_tract/unemployment_tract.shp") %>%
   rename("unemployment_rate" = "unmply_") %>%
-  mutate(unemployment_rate = unemployment_rate * 100 )
+  mutate(unemployment_rate = unemployment_rate * 100)
 ```
 
 We can see that the shapefile has a coordinate system which is NAD 1983, State Plane Missouri East, FIPS 2401 feet. Next we will create a simple static map using the _tmap_ package. We will call the `stl_wards` shapefile within the `tm_shape()` function which is used to call a spatial object. Within that function we will designate miles as our units of measurement. The `stl_wards` shapefile is a polygon, so we need to also add the `tm_polygons()` function to draw the polygons.
@@ -152,11 +150,10 @@ We can add cartographic elements to the map which includes a title, scale bar, a
 ```{r code-3, eval=FALSE}
 tmap_mode("plot")
 tm_shape(stl_wards, unit = "mi") +
-  tm_polygons()+
+  tm_polygons() +
   tm_layout(title = "Wards in St. Louis City", title.size = .7) +
   tm_scale_bar(position = c("right", "bottom"), width = .3) +
   tm_compass(position = c("left", "top"))
-  
 ```
 ![caption](tmap-images/code-3.png)
 
@@ -178,11 +175,13 @@ The legend title can be cleaned up, so let's change the name of the legend when 
 ```{r code-6, eval=FALSE}
 tmap_mode("plot")
 tm_shape(stl_tracts, unit = "mi") +
-  tm_polygons("unemployment_rate", title = "Unemployment rate")  +
-   tm_layout(title = "Percentage unemployed by\n Census tract", title.size = .7, legend.width = 1, legend.text.size = .4, legend.title.size = .5, legend.position = c("left", "top"),
-             inner.margins = c(0.01, 0.01, .12, .25)) +
-    tm_scale_bar(position = c("right", "bottom"), width = .3) +
-    tm_compass(position = c("right", "center"))
+  tm_polygons("unemployment_rate", title = "Unemployment rate") +
+  tm_layout(
+    title = "Percentage unemployed by\n Census tract", title.size = .7, legend.width = 1, legend.text.size = .4, legend.title.size = .5, legend.position = c("left", "top"),
+    inner.margins = c(0.01, 0.01, .12, .25)
+  ) +
+  tm_scale_bar(position = c("right", "bottom"), width = .3) +
+  tm_compass(position = c("right", "center"))
 ```
 ![caption](tmap-images/code-6.png)
 
@@ -200,10 +199,11 @@ Let's create a _leaflet_ version of the map showing the unemployment rates by Ce
 ```{r code-8, eval=FALSE}
 tmap_mode("view")
 tm_shape(stl_tracts) +
-  tm_fill("unemployment_rate", title= "Umemployment rate",
-          popup.vars = c("% unemployed" = "unemployment_rate"), 
-          id = "NAME")
-
+  tm_fill("unemployment_rate",
+    title = "Umemployment rate",
+    popup.vars = c("% unemployed" = "unemployment_rate"),
+    id = "NAME"
+  )
 ```
 ![caption](tmap-images/code-8.png)
 
@@ -216,4 +216,3 @@ Spatial data is composed of vector and raster data. Vector data is composed of p
 ## Additional Resources {#tmap-resources}
   * U.S. Census Bureau (2022). Glossary. Retrieved from https://www.census.gov/programs-surveys/geography/about/glossary.html#par_textimage_13
   * _Geocomputation with R_: https://geocompr.robinlovelace.net/index.html
-

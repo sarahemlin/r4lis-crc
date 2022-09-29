@@ -35,11 +35,11 @@ library(DT)
 We are also going to load the data that we used in the previous chapters.  This includes the csv files of the alderman contact information and the male and female unemployment information, along with the shapefiles of the St. Louis wards and Census tracts. We also need to do a simple data transformation to calculate the unemployment rate using the _dplyr_ `rename()` and `mutate()` functions.
 
 ```{r loading-data, include = FALSE}
-aldermen_info = read_csv("data/aldermen-contact.csv")
+aldermen_info <- read_csv("data/aldermen-contact.csv")
 male_low_unemployment <- read_csv("data/male-low-unemployment.csv")
 female_low_unemployment <- read_csv("data/female-low-unemployment.csv")
-stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp") 
-stl_tracts <- st_read("unemployment_tract/unemployment_tract.shp")%>%
+stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp")
+stl_tracts <- st_read("unemployment_tract/unemployment_tract.shp") %>%
   rename("unemployment_rate" = "unmply_") %>%
   mutate(unemployment_rate = unemployment_rate * 100)
 ```

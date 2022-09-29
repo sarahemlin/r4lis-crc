@@ -15,9 +15,9 @@ You need data on unemployment in the city of St. Louis, and the first step to cr
 
 ## Packages & Datasets Needed {#dplyr-pkgs}
 ```{r pkgs-dplyr, include=FALSE}
-#package installed as part of the _tidyverse_ install in the IDE chapter
+# package installed as part of the _tidyverse_ install in the IDE chapter
 library(tidyverse)
-#but there are a bunch of dependencies that also need to be loaded to work with this Census data
+# but there are a bunch of dependencies that also need to be loaded to work with this Census data
 library(units)
 library(sf)
 library(tmap)
@@ -40,7 +40,7 @@ census_api_key("ed1fd61839f37607fd14fc8bfbdcf66b1f0f470f")
 
 If you're following along and entering this code into your R console, sign up for your own census data key, delete the '#' and replace '"your-key-here" with your own API key.
 ```{r user-key}
-# census_api_key("your-key-here") 
+# census_api_key("your-key-here")
 ```
 
 2. Get FIPS codes
@@ -72,9 +72,17 @@ Having pulled in the FIPS codes that allow us to identify data from St. Louis an
 
 One Base R function that we'll rely on for this code is `c()`, which concatenates strings (numbers or text) into one value.  We'll concatenate the two variables we're interested in: total population and the number of unemployed.  The function `get_acs()` passes the metadata requirements to the Census database, returning the data we need for each Census tract.  We're interested in all the variables and want to see them spread out across the columns, so we will use the `output = "wide"` setting to adjust the output.
 ```{r census}
-data <- get_acs(geography = "tract", variables = c(
-  total_pop = "B23001_001",
-  unemployed = "B23025_007"), state = "MO", county = "510", year = 2019, output = "wide")
+data <- get_acs(
+  geography = "tract",
+  variables = c(
+    total_pop = "B23001_001",
+    unemployed = "B23025_007"
+  ),
+  state = "MO",
+  county = "510",
+  year = 2019,
+  output = "wide"
+)
 
 data
 ```
@@ -103,14 +111,17 @@ One of the formative concepts of the Tidyverse, which we will rely upon heavily 
 We'll use the "object [then] function" pattern to create a new variable and column for the unemployment rate.  The ACS doesn't provide an unemployment rate, so we must calculate it from the columns we have: total population and population unemployed.  Our task here is two-fold: 1) create a new column and 2) populate each row in the column with its calculated unemployment rate. This is the number unemployed divided by the total population:
 ```{r unemploy-rate}
 unemployment_data <- data %>%
-  mutate(unemployment_rate = as.numeric(unemployedE)/as.numeric(total_popE)) 
+  mutate(
+    unemployment_rate =
+      as.numeric(unemployedE) / as.numeric(total_popE)
+  )
 ```
 In plain English, the code above says "create a new object called `unemployment_data`, which takes the `data` object and then makes a new column in it called `unemployment_rate`; fill the rows in that new column with the value of the number unemployed divided by the total population."
 
 ### Save unemployment data
 Before going any further, we will save the `unemployment_data` object to a CSV file in the `data/` sub-directory, or folder, using the `write_csv()` function from _readr_:
 ```{r unemploy-data-file}
-write_csv(unemployment_data, "data/unemployment_data.csv") 
+write_csv(unemployment_data, "data/unemployment_data.csv")
 ```
 
 ### Find the areas with the highest unemployment
@@ -142,12 +153,13 @@ Now that we have the top ten Census block groups with the highest and lowest une
 When we use the `get_acs` function to pull that survey's data from the census website, we need to specify which particular table of data we need.  "Tract" is the unit of geographical measurement we need; we'll include the year, county/state, and the code for the table.  A Census tract is a usually permanent subdivision of a county with about 4,000 people that reside within its bounds^[https://www.census.gov/programs-surveys/geography/about/glossary.html#par_textimage_13].  We'll use the _dplyr_ function `glimpse()` to see a list of column names and a snippet of the values for each. This function is handy to see an object at a glance to understand what it contains.
 
 ```{r job-table}
-occupation_data  <- get_acs(
-  geography = "tract", 
-  state = "MO", 
-  county = "510", 
-  year = 2019, 
-  table = "C24010")
+occupation_data <- get_acs(
+  geography = "tract",
+  state = "MO",
+  county = "510",
+  year = 2019,
+  table = "C24010"
+)
 
 glimpse(occupation_data)
 ```
@@ -156,7 +168,7 @@ The GEOID variable, which contains the Census tract ID, is present in both the o
 ### Save occupation data
 We'll save the occupation data to a CSV file so we can use it later.
 ```{r csv-job-data}
-write_csv(occupation_data, "data/occupation_data.csv") 
+write_csv(occupation_data, "data/occupation_data.csv")
 ```
 
 ### Select occupations with the highest and lowest unemployment
@@ -164,18 +176,18 @@ We will need to use `filter()` to get the occupations with the highest and lowes
 
 To find the occupations (jobs) with the lowest unemployment, we want to take the `occupation_data` object and filter out the rows whose GEOID matches the GEOID field in the `low_unemploy` object.  Then we want to arrange them in descending order by the `estimate` column.
 ```{r low-jobs}
-low_unemploy_jobs <- occupation_data %>% 
+low_unemploy_jobs <- occupation_data %>%
   filter(GEOID %in% low_unemploy$GEOID) %>%
-  arrange(desc(estimate)) 
+  arrange(desc(estimate))
 
 glimpse(low_unemploy_jobs)
 ```
 
 We'll perform the same functions for jobs with the highest unemployment but compare rows against the `high_unemploy` object.
 ```{r high-jobs}
-high_unemploy_jobs <- occupation_data %>% 
+high_unemploy_jobs <- occupation_data %>%
   filter(GEOID %in% high_unemploy$GEOID) %>%
-  arrange(desc(estimate)) 
+  arrange(desc(estimate))
 
 glimpse(high_unemploy_jobs)
 ```
@@ -203,11 +215,11 @@ Census data includes binary gender classifications (male/female) for each occupa
 
 We'll use several new _dplyr_ functions to refine the dataset.  To group variables with the same values, `group_by()` lets us specify which column name to use.  The pipe comes in handy as we work several sequential steps on the same `low_unemploy_jobs_join` dataset.  First, we'll group the values by `label`.  Then we'll use `summarize()`^[https://dplyr.tidyverse.org/reference/summarise.html], which is a function that will create a new table of summarized data containing the grouped labels and the column called `total` that will contain the total `estimate` column.  We can then arrange the values in descending order.  The last function we will pipe into this object is `filter()`, which we'll use to exclude gross aggregate estimates that are over 10,000.  Excluded values include the total estimate and total female estimate rows because we're interested in specific occupation data.
 ```{r low-jobs-ct}
-low_unemploy_jobs_ct <- low_unemploy_jobs_join %>% 
+low_unemploy_jobs_ct <- low_unemploy_jobs_join %>%
   group_by(label) %>%
   summarize(total = sum(estimate)) %>%
   arrange(desc(total)) %>%
-  filter(total < 10000) 
+  filter(total < 10000)
 ```
 
 ### Occupations with the lowest unemployment for men
@@ -215,7 +227,7 @@ Because the occupation rankings differ for men and women, we need to separate th
 ```{r low-unemploy-male}
 # Get the top ten by male occupations by detecting the word "Male"
 # in the labels using the `str_detect()` function in _stringr_
-low_unemploy_jobs_male <- low_unemploy_jobs_ct %>% 
+low_unemploy_jobs_male <- low_unemploy_jobs_ct %>%
   filter(str_detect(label, "Male")) %>%
   arrange(desc(total)) %>%
   head(n = 10)
@@ -228,7 +240,7 @@ To create a new dataset showing occupations with the lowest unemployment for wom
 ```{r low-unemploy-female}
 # Get the top ten by female occupations by detecting the word
 # "Female" in the labels using the `str_detect()` function in _stringr_
-low_unemploy_jobs_female <- low_unemploy_jobs_ct %>% #clean
+low_unemploy_jobs_female <- low_unemploy_jobs_ct %>% # clean
   filter(str_detect(label, "Female")) %>%
   arrange(desc(total)) %>%
   head(n = 10)
@@ -253,7 +265,7 @@ clean_labels_m <- tribble(
   "Estimate!!Total:!!Male:!!Service occupations:", "Service occupations",
   "Estimate!!Total:!!Male:!!Sales and office occupations:", "Sales & office",
   "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Computer, engineering, and science occupations:", "Computer, engineering, & science",
-  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:!!Management occupations", "Management", 
+  "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Management, business, and financial occupations:!!Management occupations", "Management",
   "Estimate!!Total:!!Male:!!Management, business, science, and arts occupations:!!Education, legal, community service, arts, and media occupations:", "Education, legal, community service, arts, & media",
   "Estimate!!Total:!!Male:!!Production, transportation, and material moving occupations:", "Production, transportation, & material moving",
   "Estimate!!Total:!!Male:!!Sales and office occupations:!!Sales and related occupations", "Sales",
@@ -272,8 +284,8 @@ Now that we have a table of clean occupation labels, we can use another `left_jo
 low_unemploy_jobs_malec <- left_join(
   low_unemploy_jobs_male,
   clean_labels_m,
-  by = 'label'
-  )
+  by = "label"
+)
 
 glimpse(low_unemploy_jobs_malec)
 ```
@@ -307,8 +319,8 @@ Again, we'll use the previous tool of `left_join()` to combine the clean labels 
 low_unemploy_jobs_femalec <- left_join(
   low_unemploy_jobs_female,
   clean_labels_f,
-  by = 'label'
-  )
+  by = "label"
+)
 ```
 
 ## Create a csv of unemployment data {#unemploy-csv}

@@ -28,11 +28,11 @@ library(shiny)
 ```
 
 ```{r global, include = FALSE}
-aldermen_info = read_csv("data/aldermen-contact.csv")
+aldermen_info <- read_csv("data/aldermen-contact.csv")
 male_low_unemployment <- read_csv("data/male-low-unemployment.csv")
 female_low_unemployment <- read_csv("data/female-low-unemployment.csv")
-stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp") 
-stl_tracts <- st_read("unemployment_tract/unemployment_tract.shp")%>%
+stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp")
+stl_tracts <- st_read("unemployment_tract/unemployment_tract.shp") %>%
   rename("unemployment_rate" = "unmply_") %>%
   mutate(unemployment_rate = unemployment_rate * 100)
 data <- stl_wards
@@ -51,11 +51,10 @@ Shiny apps are composed of three parts, which are the user interface (UI), the s
 In RStudio, you can create a Shiny app by going to File > Shiny Web App. You will be prompted to give an application name and application type. Name the app "stl_web_map" and select the Single File (app.R) type since we are creating a small app. The Multiple File(ui.R/server.R) type is best when you are creating larger shiny apps^[https://shiny.rstudio.com/articles/two-file.html]. To get started, we need to create the user interface and the server functions.
 ```{r shiny_app, eval= FALSE}
 # creating the ui
-ui <- fluidPage(
-)
+ui <- fluidPage()
 
 # creating the server
-server <- function(input, output){
+server <- function(input, output) {
 }
 
 # running the app
@@ -70,11 +69,11 @@ layers <- c("Select a variable", "Unemployment rate by ward", "St. Louis Wards")
 
 # creating the ui
 ui <- fluidPage(
-   selectInput("var", "St. Louis Maps", choices = layers, selected = layers[1])
+  selectInput("var", "St. Louis Maps", choices = layers, selected = layers[1])
 )
 
 # creating the server
-server <- function(input, output){
+server <- function(input, output) {
 }
 
 # running the app
@@ -91,20 +90,19 @@ layers <- c("Select a variable", "Unemployment rate by ward", "St. Louis Wards")
 
 # creating the ui
 ui <- fluidPage(
-   selectInput("var", "St. Louis Maps", choices = layers, selected = layers[1])
+  selectInput("var", "St. Louis Maps", choices = layers, selected = layers[1])
 )
 
 # creating the server
-server <- function(input, output){
+server <- function(input, output) {
   # this is the map that will load
-tmapOutput("map")
+  tmapOutput("map")
 
-output$map <- renderTmap({
-       tmap_mode("view")
-       tm_shape(data, unit = "mi")+
-       tm_polygons(zindex = 401)
-})
-  
+  output$map <- renderTmap({
+    tmap_mode("view")
+    tm_shape(data, unit = "mi") +
+      tm_polygons(zindex = 401)
+  })
 }
 
 # running the app
@@ -121,44 +119,45 @@ layers <- c("Select a variable", "Unemployment rate by ward", "St. Louis Wards")
 
 # creating the ui
 ui <- fluidPage(
-   selectInput("var", "St. Louis Maps", choices = layers, selected = layers[1])
+  selectInput("var", "St. Louis Maps", choices = layers, selected = layers[1])
 )
 
 # creating the server
-server <- function(input, output){
+server <- function(input, output) {
   # this is the map that will load
-tmapOutput("map")
+  tmapOutput("map")
 
-output$map <- renderTmap({
-       tmap_mode("view")
-       tm_shape(data, unit = "mi")+
-       tm_polygons(zindex = 401)
-})
+  output$map <- renderTmap({
+    tmap_mode("view")
+    tm_shape(data, unit = "mi") +
+      tm_polygons(zindex = 401)
+  })
 
 
-observeEvent(input$var,
-{
-  if(input$var == layers[2]){
-    data <- stl_tracts
-    tmapProxy("map", session, {
-      tm_remove_layer(401) +
-        tm_shape(data) +
-         tm_fill("unemployment_rate", title= "Umemployment rate",
-          popup.vars = c("% unemployed" = "unemployment_rate"), 
-          id = "NAME")+
-        tm_polygons(zindex = 401)
-    })
-  }
-  
-  if(input$var == layers[3]){
-    data <- stl_wards
-    tmapProxy("map", session, {
-      tm_remove_layer(401) +
-        tm_shape(data) +
-        tm_polygons(zindex = 401)
-    })
-  } 
-})
+  observeEvent(input$var, {
+    if (input$var == layers[2]) {
+      data <- stl_tracts
+      tmapProxy("map", session, {
+        tm_remove_layer(401) +
+          tm_shape(data) +
+          tm_fill("unemployment_rate",
+            title = "Umemployment rate",
+            popup.vars = c("% unemployed" = "unemployment_rate"),
+            id = "NAME"
+          ) +
+          tm_polygons(zindex = 401)
+      })
+    }
+
+    if (input$var == layers[3]) {
+      data <- stl_wards
+      tmapProxy("map", session, {
+        tm_remove_layer(401) +
+          tm_shape(data) +
+          tm_polygons(zindex = 401)
+      })
+    }
+  })
 }
 
 # running the app
@@ -186,38 +185,44 @@ ui <- fluidPage(
 )
 
 # creating the server
-server <- function(input, output){
+server <- function(input, output) {
   # this is the plot that will load
   plotOutput("plot")
-output$plot <- renderPlot({
-  ggplot(female_low_unemployment, aes(x = total, y = reorder(female_jobs, total))) +
-  geom_col() +
-  labs(title = "Top ten female occupations in census tracts with lowest unemployment",
-       x = "Total", y = "Occupation")
-})
-  
- observeEvent(input$plots, {
-   
-  if(input$plots == stl_plot_choices[2]){
-    output$plot <- renderPlot({
-      ggplot(female_low_unemployment, aes(x = total, y =     
-      reorder(female_jobs, total))) +
-  geom_col() +
-  labs(title = "Top ten female occupations in census tracts with lowest unemployment",
-     x = "Total", y = "Occupation")
-})
-  }    
-   
-    if(input$plots == stl_plot_choices[3]){
-     output$plot <- renderPlot({
-       ggplot(male_low_unemployment, aes(x = total, y = reorder(male_jobs, total))) +
-   geom_col() +
-   labs(title = "Top ten male occupations in census tracts with lowest unemployment",
-        x = "Total", y = "Occupation")
-    })
-    }  
- })
-  
+  output$plot <- renderPlot({
+    ggplot(female_low_unemployment, aes(x = total, y = reorder(female_jobs, total))) +
+      geom_col() +
+      labs(
+        title = "Top ten female occupations in census tracts with lowest unemployment",
+        x = "Total", y = "Occupation"
+      )
+  })
+
+  observeEvent(input$plots, {
+    if (input$plots == stl_plot_choices[2]) {
+      output$plot <- renderPlot({
+        ggplot(female_low_unemployment, aes(
+          x = total, y =
+            reorder(female_jobs, total)
+        )) +
+          geom_col() +
+          labs(
+            title = "Top ten female occupations in census tracts with lowest unemployment",
+            x = "Total", y = "Occupation"
+          )
+      })
+    }
+
+    if (input$plots == stl_plot_choices[3]) {
+      output$plot <- renderPlot({
+        ggplot(male_low_unemployment, aes(x = total, y = reorder(male_jobs, total))) +
+          geom_col() +
+          labs(
+            title = "Top ten male occupations in census tracts with lowest unemployment",
+            x = "Total", y = "Occupation"
+          )
+      })
+    }
+  })
 }
 
 # running the app

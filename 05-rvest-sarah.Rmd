@@ -77,7 +77,7 @@ We'll need to use two new operators to select the even and odd rows separately: 
 
 ```{r odd-rows}
 ward_num <- wards %>%
-  filter(row_number() %% 2 == 1) %>% #odd rows
+  filter(row_number() %% 2 == 1) %>% # odd rows
   tibble() %>%
   rename(Ward = names(.)) # here the '.' can be read as "the current object, created in the previous line"
 ```
@@ -87,9 +87,9 @@ Additionally, we'll rename the columns with a blank header using the dplyr `rena
 While this explanation is a little long, this code is more efficient than creating an object with an blank column name and then adding a new object that is the same data, but with a new column name.  In essence, this code allows us to do all of our actions in one object rather than two.
 ```{r even-rename}
 alderman <- wards %>%
-  filter(row_number() %% 2 == 0) %>% #even rows
+  filter(row_number() %% 2 == 0) %>% # even rows
   tibble() %>%
-  rename (Alderman = names(.)) # rename the Alderman column, which has a blank header
+  rename(Alderman = names(.)) # rename the Alderman column, which has a blank header
 ```
 
 Finally, the column bind function, `base::cbind()`, will let us bind the objects for alderman names and ward numbers together into one table, where each vector becomes a column in the table:
@@ -113,8 +113,8 @@ base_url <- "https://www.stlouis-mo.gov"
 href <- read_html("scrape.html") %>%
   html_nodes(".data a") %>%
   html_attr("href") %>%
-  file.path(base_url, .) %>% 
-  str_replace_all("gov//", "gov/") %>% 
+  file.path(base_url, .) %>%
+  str_replace_all("gov//", "gov/") %>%
   tibble()
 ```
 There's an additional step to mention here: the base URL ends in a forward slash, and the relative file path starts with a forward slash.  Combining these two portions will get a double forward slash that will invalidate the complete URL.  We'll utilize a function from the _stringr_ package (part of _tidyverse_) that lets us modify a string in many ways.  We want to use `str_replace_all()` to remove the double forward slash.  However, we must specify that we only want to replace the double forward slash after `gov`.  Otherwise, our code will replace the double forward slash after `https:`. Only then can we store the data in a tibble and check to see that the data looks clean.
@@ -130,7 +130,7 @@ Similar to the duplication problem we had at the start of the chapter, we're get
 urls <- href %>%
   filter(row_number() %% 2 == 0)
 
-websites <- rename(urls, website = .) 
+websites <- rename(urls, website = .)
 
 websites
 ```
@@ -139,8 +139,8 @@ websites
 
 We've come far enough that it makes sense to combine the objects we have into a single table.  Again, we'll use the column bind function to combine the objects we have so far into one table:
 ```{r vector-bind}
-all_urls <- cbind(wards_alderman, websites) 
-#now we have a table of ward, alderman name, and link to their individual bio page
+all_urls <- cbind(wards_alderman, websites)
+# now we have a table of ward, alderman name, and link to their individual bio page
 ```
 
 ### Automating tedious scraping
@@ -164,11 +164,11 @@ Before scraping email addresses for each alderman, we must determine which CSS s
 
 We are now ready to automate scraping each alderman's website for their email address.  First, we will use `map()` to read in the HTML for each element of our vector of alderman website URLs.  Then we will use `map()` again to scrape the CSS selector `strong+ a` from the HTML we read for each site.  
 ```{r emails-scrape, cache=TRUE}
-scrape_sites <- map(vector_urls, read_html) 
-#scrape each URL in the vector
+scrape_sites <- map(vector_urls, read_html)
+# scrape each URL in the vector
 
-scrape_email <- map(scrape_sites, html_node, 'strong+ a') 
-#pull out the email address on each of those pages
+scrape_email <- map(scrape_sites, html_node, "strong+ a")
+# pull out the email address on each of those pages
 ```
 
 2. Convert email addresses into readable format
@@ -200,7 +200,7 @@ Now have the full dataset we need to contact all the aldermen!
 
 Once we've created a complete, tidy table of all the wards, the aldermen, and their email addresses, we want to save that as a CSV file for reuse or sharing.
 ```{r contacts, eval=FALSE}
-write_csv(complete, "data/aldermen-contact.csv") 
+write_csv(complete, "data/aldermen-contact.csv")
 ```
 The `write_csv` function takes our object, 'complete,' and turns it into a CSV file we could read back into R or view in a spreadsheet application like Google Sheets or Microsoft Excel.
 

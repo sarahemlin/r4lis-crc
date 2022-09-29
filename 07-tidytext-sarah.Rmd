@@ -100,25 +100,26 @@ We want to search for the word "unemployment" in the US section of the NYT.  Thi
 ```{r tidytext-baseurl}
 baseurl <- paste0(
   "http://api.nytimes.com/svc/search/v2/articlesearch.json?q=unemployment&section_name=(U.S.)",
-  api_key)
+  api_key
+)
 ```
 
 2. Create an object to represent the number of search results pages we want to retrieve. 
 
 When using the API, each search results page contains ten records per page, and the API will only return one page of results at a time, no matter how many total pages the search returns.  However, the ten records included on one page of search results will not provide enough data for text analysis so we will need many more than just one page.  To balance the need for a large dataset without taking too long to process the data, we will retrieve output for 25 pages of search results.  Before we run the query, we need to create an object that will store all of our API output.
 ```{r nyt-vector}
-pages <- vector("list",length=25) #25 pages is 250 articles
+pages <- vector("list", length = 25) # 25 pages is 250 articles
 ```
 
 3. Retrieve 25 pages of search results
 
 We need to retrieve each page of search results, so that we can combine them into one dataset in a subsequent step.
 ```{r manual-api}
-page1 <- fromJSON(paste0(baseurl,"&page=1")) %>%
-    data.frame()
-  
-page2 <- fromJSON(paste0(baseurl,"&page=2")) %>%
-    data.frame()
+page1 <- fromJSON(paste0(baseurl, "&page=1")) %>%
+  data.frame()
+
+page2 <- fromJSON(paste0(baseurl, "&page=2")) %>%
+  data.frame()
 ```
 Writing out the code for just two pages of search results is more than enough; who wants to write that code 23 more times and then concatenate them(`c(page1, page2, ...)`) together into one table?
 
@@ -133,10 +134,10 @@ One characteristic of JSON data, which is used frequently in websites and web ap
 In the sequence below, _i_ is a placeholder for each page number.  We see this in two places, the for-loop as well in the output, where we want to create an object from each page (page _i_ in pages 1-25).  Also, there's a limit of 10 requests per minute for NYT API calls.  Since we have 25 calls to make, we must pause for 6 seconds between page calls.
 
 ```{r api-call, cache = TRUE}
-for(i in 1:25){ # can be read as "for every page number from 1 to 25"
-    nytSearch <- fromJSON(paste0(baseurl, "&page=", i), flatten = TRUE) %>% data.frame() # _body_
-    pages[[i]] <- nytSearch # _output_
-    Sys.sleep(6) #there's a limit of 10 requests per minute for API calls so we must pause for 6 seconds before initiating the next call
+for (i in 1:25) { # can be read as "for every page number from 1 to 25"
+  nytSearch <- fromJSON(paste0(baseurl, "&page=", i), flatten = TRUE) %>% data.frame() # _body_
+  pages[[i]] <- nytSearch # _output_
+  Sys.sleep(6) # there's a limit of 10 requests per minute for API calls so we must pause for 6 seconds before initiating the next call
 }
 ```
 
@@ -157,8 +158,10 @@ From the list of column names, we can see the specific field syntax we need.  Ou
 3. We'll create a new object that is a data frame of only the four text columns we want to use.
 ```{r select-fields}
 text_fields <- articles_json %>%
-  dplyr::select(c(response.docs.abstract, response.docs.snippet, # select() is a _dplyr_ function
-  response.docs.lead_paragraph, response.docs.headline.main))
+  dplyr::select(c(
+    response.docs.abstract, response.docs.snippet, # select() is a _dplyr_ function
+    response.docs.lead_paragraph, response.docs.headline.main
+  ))
 ```
 
 ## Tokenization {#tokenization}
@@ -212,7 +215,7 @@ snippets <- tibble(snippet_token[[4]])
 
 After pulling the tokens out of their respective objects, we need to combine them into one very long column using `c()`.  The single column in our table is unnamed, which we will rename so that we can use it in the next section, just like we did in Chapter 5.  
 ```{r create-words}
-words <- c(abstracts,headlines,leads,snippets) %>%
+words <- c(abstracts, headlines, leads, snippets) %>%
   unlist() %>%
   tibble() %>%
   rename(word = names(.))
@@ -226,10 +229,10 @@ As you remove stop words, however, be aware that what's considered a stop word c
 ### Remove stop words from the words object {#remove-stopwords}
 The _tidytext_ package comes with a stop words dataset that we can load and run against our words dataset.  We'll use a join from the _dplyr_ chapter; in this case, we want to use `anti_join()`, which will remove any values that appear in both the words & stop_words datasets.  This way, any word in the stop words list that appears in our dataset will be removed, along with words that have no match.  An anti_join must match on columns with the same name.  The stop_words dataset has a column named word, and we renamed one of columns in the previous step to word also, so now our anti-join will work.
 ```{r load-stopwords,}
-data("stop_words") #loads the stop words set from _tidytext_
+data("stop_words") # loads the stop words set from _tidytext_
 
 tidy_words <- words %>%
-  anti_join(stop_words) #using a _dplyr_ join, remove stop words found in the words dataset
+  anti_join(stop_words) # using a _dplyr_ join, remove stop words found in the words dataset
 ```
 
 ## Sentiment analysis {#sentiment-analysis}
@@ -243,7 +246,7 @@ We are interested in the negative cultural connotation of the word 'unemployment
 To determine the sentiment of our dataset of articles about unemployment, we will join the Bing lexicon [@Hu04] with our tokenized dataset and count the number of positive and negative emotions.
 ```{r bing}
 bing <- tidy_words %>%
-  inner_join(get_sentiments("bing")) 
+  inner_join(get_sentiments("bing"))
 bing_count <- bing %>%
   count(sentiment)
 ```
@@ -252,7 +255,7 @@ print(bing_count)
 ```
 This count shows that the 200 unemployment-related articles we analyzed are dominantly negative.  By doing a little bit of calculation, we can see the exact ratio of negative to positive words.
 ```{r bing-ratio}
-ratio <- 877/378 
+ratio <- 877 / 378
 
 print(ratio)
 ```
@@ -269,7 +272,7 @@ When we're analyzing a textual dataset, using **tf-idf** can tell us the most me
 The first part of tf-idf is term frequency.  To determine the frequency of the different words in our dataset, we need to count term frequency and sort them in descending order.
 ```{r word-counts}
 word_counts <- tidy_words %>%
-  count(word, sort = TRUE) 
+  count(word, sort = TRUE)
 
 head(word_counts)
 ```
@@ -278,9 +281,11 @@ This lists all the words in the dataset with a count of how many times each word
 ### Identify the text’s most common words {#term-frequency}
 Once we have a count of each term's frequency in the overall dataset, we are able to perform the tf-idf calculation to determine which words are most important. 
 ```{r rank frequency}
-rank_frequency <- word_counts %>%  #take our list of words, minus stop words
-  mutate(rank = row_number(),  #add a new column called rank, which writes the row number for that row
-         term_frequency = n/12731)  #add a new column called term frequency, which calculates the frequency for each term by dividing the total number of count of observations in tidy_words dataset (12731) by the count of each word
+rank_frequency <- word_counts %>% # take our list of words, minus stop words
+  mutate(
+    rank = row_number(), # add a new column called rank, which writes the row number for that row
+    term_frequency = n / 12731
+  ) # add a new column called term frequency, which calculates the frequency for each term by dividing the total number of count of observations in tidy_words dataset (12731) by the count of each word
 print(rank_frequency)
 ```
 
@@ -291,7 +296,7 @@ The new column `term_frequency`, is a calculated field because it is derived fro
 Making a plot to show term frequencies is a way to ensure that the textual dataset has a normal distribution.  Due to Zipf's Law, a 'normal' distribution here would be a constant negative slope; the straight line should be higher on the left and lower on the right.  However, when we look at the `term_frequency` column in the preceding step, we notice that the numbers start small and then get progresively smaller.  If we made a plot of this data as-is, it would not follow the bell-curve of what statisticians call a 'normal distribution.'  In cases like these, a data scientist might want to transform the entire dataset by taking the log(x) of each value.  We'll apply a logarithmic scale to both our x and y axis with the `scale_*_log10()` functions in our `ggplot()` function call:
 ```{r plot-frequency}
 rank_frequency %>%
-  ggplot(aes(rank, term_frequency, color = word)) +  # note that when you start your ggplot2 code, each line is ended with a `+` instead of the pipe
+  ggplot(aes(rank, term_frequency, color = word)) + # note that when you start your ggplot2 code, each line is ended with a `+` instead of the pipe
   geom_line(group = 1, size = 1.1, alpha = 0.8, show.legend = FALSE) +
   scale_x_log10() + # we're using a logarithmic scale on both axis to show the constant negative slop
   scale_y_log10()

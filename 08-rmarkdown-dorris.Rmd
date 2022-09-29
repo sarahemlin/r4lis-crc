@@ -25,11 +25,11 @@ library(readr)
 library(sf)
 library(tmap)
 
-#csv files
+# csv files
 male_low_unemployment <- read_csv("data/male-low-unemployment.csv")
 female_low_unemployment <- read_csv("data/female-low-unemployment.csv")
 
-#shapefiles
+# shapefiles
 stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp")
 unemployment_tract <- st_read("unemployment_tract/unemployment_tract.shp")
 ```
@@ -128,8 +128,10 @@ You can also embed data visualizations such as plots and maps into R Markdown.  
 low_unemployment_female_plot <- female_low_unemployment %>%
   ggplot(aes(x = total, y = reorder(female_jobs, total))) +
   geom_col() +
-  labs(title = "Top ten female occupations in census tracts with lowest unemployment",
-       x = "Total", y = "Occupation")
+  labs(
+    title = "Top ten female occupations in census tracts with lowest unemployment",
+    x = "Total", y = "Occupation"
+  )
 
 low_unemployment_female_plot
 ```
@@ -137,10 +139,10 @@ low_unemployment_female_plot
 You can also embed maps into your R Markdown document.  As with the code chunk before, we make sure the setting is `echo = TRUE` so we can see the output of the code, which will be a map of the wards in St. Louis.
 
 ```{r, echo=TRUE}
-tm_shape(stl_wards, unit = "mi")+
-  tm_polygons()+
+tm_shape(stl_wards, unit = "mi") +
+  tm_polygons() +
   tm_layout(title = "Wards in St. Louis City", title.size = .7) +
-  tm_scale_bar(position = c("right", "bottom"), width = .3)+
+  tm_scale_bar(position = c("right", "bottom"), width = .3) +
   tm_compass(position = c("left", "top"))
 ```
 

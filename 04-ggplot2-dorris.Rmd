@@ -75,7 +75,8 @@ You use `geom_col()` for a continuous and discrete variable. To add a layer to y
 ```{r ten-highest}
 # Ten Census block groups with the highest unemployment rates
 high_unemp_plot <- high_unemploy %>%
-  ggplot(aes(x = unemployment_rate, y = reorder(NAME, unemployment_rate))) + geom_col()
+  ggplot(aes(x = unemployment_rate, y = reorder(NAME, unemployment_rate))) +
+  geom_col()
 
 high_unemp_plot
 ```
@@ -84,7 +85,8 @@ Let's break down this code. We are creating a variable called `high_unemp_plot` 
 ```{r ten-lowest}
 # Ten Census block groups with the lowest unemployment rates
 low_unemp_plot <- low_unemploy %>%
-  ggplot(aes(x = unemployment_rate, y = reorder(NAME, unemployment_rate))) +  geom_col() 
+  ggplot(aes(x = unemployment_rate, y = reorder(NAME, unemployment_rate))) +
+  geom_col()
 
 low_unemp_plot
 ```
@@ -100,7 +102,7 @@ high_unemp_plot
 
 We will also do the same for low_unemp_plot.
 ```{r low-plot}
-low_unemp_plot <- low_unemp_plot + 
+low_unemp_plot <- low_unemp_plot +
   labs(title = "Ten census tracts with the lowest unemployment rate", x = "Unemployment Rate", y = "Census Tract")
 
 low_unemp_plot
@@ -111,7 +113,7 @@ Now that we have the top ten Census block groups with the highest and lowest une
 ```{r low-female-jobs}
 low_unemployment_female_plot <- female_low_unemployment %>%
   ggplot(aes(x = total, y = reorder(female_jobs, total))) +
-  geom_col() 
+  geom_col()
 
 low_unemployment_female_plot
 ```
@@ -130,16 +132,20 @@ Now we will add a title and x and y axis label layer to the two plots through `+
 
 ```{r low-female-labels}
 low_unemployment_female_plot <- low_unemployment_female_plot +
-  labs(title = "Top ten female occupations in census tracts with lowest unemployment",
-       x = "Total", y = "Occupation")
+  labs(
+    title = "Top ten female occupations in census tracts with lowest unemployment",
+    x = "Total", y = "Occupation"
+  )
 
 low_unemployment_female_plot
 ```
 
 ```{r low-male-labels}
 low_unemployment_male_plot <- low_unemployment_male_plot +
-  labs(title = "Top ten male occupations in census tracts with lowest unemployment",
-       x = "Total", y = "Occupation")
+  labs(
+    title = "Top ten male occupations in census tracts with lowest unemployment",
+    x = "Total", y = "Occupation"
+  )
 
 low_unemployment_male_plot
 ```
@@ -153,11 +159,11 @@ If you want to plot data by a particular categorical variable, you can use facet
 One way in which we can create facets through the `facet_wrap()` function. Use this function when you want to facet one variable [wickham2016]. Let's look at the life expectancy (lifeExp) vs. GDP per capita (gdpPercap) by decade from 1957 to 2007. Before we can start faceting, we must to get the data.
 
 ```{r gapminder-variable}
-#saving the gapminder data into a variable.
-gapminder_data <- gapminder 
-#separating the gapminder data by decade from 1957 to 2007.
+# saving the gapminder data into a variable.
+gapminder_data <- gapminder
+# separating the gapminder data by decade from 1957 to 2007.
 gapminder_decade_data <- gapminder_data %>%
-  filter(year %in% c(1957, 1967, 1977, 1987,1997, 2007))
+  filter(year %in% c(1957, 1967, 1977, 1987, 1997, 2007))
 ```
 We create a variable called `gapminder_data` by calling the built-in dataset called gapminder. We want the data by decade from 1957 to 2007, so we create another variable called `gapminder_decade_data` and we filter the data by decade from 1957 to 2007 using the `%in%` operator to extract the specific years that is indicated in the vector `c(1957, 1967, 1977, 1987,1997, 2007)`.
 
@@ -165,7 +171,7 @@ We create a variable called `gapminder_data` by calling the built-in dataset cal
 gdp_lifeexp_year_plot <- gapminder_decade_data %>%
   ggplot(aes(gdpPercap, lifeExp)) +
   geom_point() +
-  facet_wrap(~ year)
+  facet_wrap(~year)
 
 gdp_lifeexp_year_plot
 ```
@@ -188,7 +194,7 @@ To spread values across columns, we would need to use `.~` [@wickham2020]. In th
 gdp_lifeexp_plot <- gapminder_decade_data %>%
   ggplot(aes(gdpPercap, lifeExp)) +
   geom_point() +
-  facet_grid(.~continent)
+  facet_grid(. ~ continent)
 
 gdp_lifeexp_plot
 ```
@@ -199,7 +205,7 @@ In this code chunk, we created a variable to store our plot called `gdp_lifeexp_
 gdp_lifeexp_plot <- gapminder_decade_data %>%
   ggplot(aes(gdpPercap, lifeExp)) +
   geom_point() +
-  facet_grid(continent ~.)
+  facet_grid(continent ~ .)
 
 gdp_lifeexp_plot
 ```
@@ -218,9 +224,11 @@ This faceting of the unemployment rate by Census tract is not neccessary because
 Scales change how the plot looks. Changing the scales, such as the minimum and maximum values in the x and y axes and the data breaks, can make your visualization more readable. For example, in the last plot of the top ten female occupations in Census tracts with the lowest unemployment, the data is broken up by 2000 units, with the max range being 6,000. Let's change the scale in which the data is broken up by 1,000 units, with the max range being 7,000.
 ```{r low-scale}
 low_unemployment_female_plot <- low_unemployment_female_plot +
-  scale_x_continuous(breaks = seq(1000,7000, by = 1000)) + 
-  labs(title = "Top ten female occupations in census tracts with lowest unemployment",
-       x = "Total", y = "Occupation")
+  scale_x_continuous(breaks = seq(1000, 7000, by = 1000)) +
+  labs(
+    title = "Top ten female occupations in census tracts with lowest unemployment",
+    x = "Total", y = "Occupation"
+  )
 
 low_unemployment_female_plot
 ```

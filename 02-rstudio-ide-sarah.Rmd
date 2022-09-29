@@ -113,9 +113,34 @@ As you progress in your data science journey, you will install more and more R p
 
 # Windows users will need to install _Rtools42_ before they can install any other packages; please see the appendix for more information.
 
-lapply(c('xfun', 'tidyverse', 'gapminder', 'tidytext', 'jsonlite', 'units', 'rgdal', 'terra', 'sf', 'tmap', 'tidycensus', 'readr', 'textdata', 'tidymodels', 'flexdashboard', 'DT', 'shiny', 'Rcpp', 'raster'), function(pkg) {
-if (system.file(package = pkg) == '') install.packages(pkg, repos="https://cloud.r-project.org")
-})
+lapply(
+  c(
+    "xfun",
+    "tidyverse",
+    "gapminder",
+    "tidytext",
+    "jsonlite",
+    "units",
+    "rgdal",
+    "terra",
+    "sf",
+    "tmap",
+    "tidycensus",
+    "readr",
+    "textdata",
+    "tidymodels",
+    "flexdashboard",
+    "DT",
+    "shiny",
+    "Rcpp",
+    "raster"
+  ),
+  function(pkg) {
+    if (system.file(package = pkg) == "") {
+      install.packages(pkg, repos = "https://cloud.r-project.org")
+    }
+  }
+)
 
 # installing _rgdal_ can sometimes result in error codes. Please see the appendix for troubleshooting tips.
 ```
