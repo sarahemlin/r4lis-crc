@@ -4,11 +4,11 @@ bookdown::gitbook:
     toc:
       collapse: none
       before: |
-        <li><a href="./">A Book Example</a></li>
+        <li><a href="./">Hands-on Data Science for Librarians</a></li>
       after: |
         <li><a href="https://bookdown.org" target="blank">Published with bookdown</a></li>
     download: [pdf, epub]
-    edit: https://github.com/yihui/bookdown-crc/edit/master/%s
+    edit: https://github.com/sarahemlin/r4lis-crc/edit/master/%s
     sharing:
       github: true
       facebook: false
@@ -23,7 +23,7 @@ bookdown::pdf_book:
   citation_package: natbib
   template: null
   pandoc_args: --top-level-division=chapter
-  toc_depth: 3
+  toc_depth: 2
   toc_unnumbered: false
   toc_appendix: true
   quote_footer: ["\\VA{", "}{}"]
