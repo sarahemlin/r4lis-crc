@@ -49,7 +49,7 @@ You plot your data on a coordinate system.  Coordinate system options in _ggplot
 
 ## Before we start {#start-plots}
 We will be using the `male_low_unemployment`, `female_low_employment`, and `unemployment_data` csv files that we created in chapter 3. Make sure that you have these data imported in RStudio. 
-```{r load-data}
+```{r load-data, message=FALSE, results='hide'}
 male_low_unemployment <- read_csv("data/male-low-unemployment.csv")
 female_low_unemployment <- read_csv("data/female-low-unemployment.csv")
 unemployment_data <- read_csv("data/unemployment_data.csv")
@@ -82,6 +82,7 @@ high_unemp_plot <- high_unemploy %>%
 
 high_unemp_plot
 ```
+
 Let's break down this code. We are creating a variable called `high_unemp_plot` which uses the `high_unemploy` data which is passed to the ggplot function via the pipe (`%>%`) operator. We then call the `ggplot()` function in which the unemployment rate will be on the x-axis whlie the Census tract name is on the y-axis. The `reorder` function will reorder the Census tracts based on the unemployment rate. As a result, the Census tract with the highest unemployment rate will be on top of the y-axis while the Census tract with the lowest unemployment rate will be on the bottom of the y-axis. The same method is applied to create the `low_unemp_plot` to indicate the Census tracts with the lowest rates of unemployment.
 
 ```{r ten-lowest}
@@ -238,11 +239,11 @@ With this plot, we can see that the variables share the same x-axis that allows 
 Now that we know about `facet_grid` and `facet_wrap`, let's revisit why the data we have been using isn't appropriate for faceting. Our data isn't appropriate for faceting because we do not have any categorical variables in our data so we can do any subsetting. Each variable in our data has one value attributed to it; each Census tract and occupation has one value attributed to it. To best show this, let's create a facet grid in faceting the unemployment rate by Census tract using the `NAME` variable through `facet_grid`.
 ```{r high-facet}
 high_unemp_plot <- high_unemp_plot +
-  facet_grid(~NAME)
+  facet_grid(~NAME) 
 
 high_unemp_plot
 ```
-This faceting of the unemployment rate by Census tract is not neccessary because it is redundant to facet by Census tract to indicate one unemployment rate per Census tract. 
+This faceting of the unemployment rate by Census tract is not neccessary because it is redundant to facet by Census tract to indicate one unemployment rate per Census tract.  Also, faceting by one variable makes our output labels unreadable. 
 
 ### Scales
 Scales change how the plot looks. Changing the scales, such as the minimum and maximum values in the x and y axes and the data breaks, can make your visualization more readable. For example, in the last plot of the top ten female occupations in Census tracts with the lowest unemployment, the data is broken up by 2000 units, with the max range being 6,000. Let's change the scale in which the data is broken up by 1,000 units, with the max range being 7,000.

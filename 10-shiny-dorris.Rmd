@@ -259,7 +259,10 @@ server <- function(input, output) {
 
     if (input$plots == stl_plot_choices[3]) {
       output$plot <- renderPlot({
-        ggplot(male_low_unemployment, aes(x = total, y = reorder(male_jobs, total))) +
+        ggplot(male_low_unemployment, aes(
+          x = total,
+          y = reorder(male_jobs, total)
+        )) +
           geom_col() +
           labs(
             title = "Top 10 male jobs in areass with low 

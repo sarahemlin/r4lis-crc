@@ -57,7 +57,7 @@ output: flexdashboard::flex_dashboard
 ---
 ```
 
-## Creating the pages {create-pages}
+## Creating the pages {#create-pages}
 First, we will create three pages in our dashboard: the St. Louis ward maps, unemployment plots, and alderman information.
 
 ```markdown
@@ -129,6 +129,7 @@ We will then put the title of the column sections and code chunks below these co
 ![Unemployment plots page](images/stl_dashboard6.png)   
 
 ![Alderman Info page](images/stl_dashboard7.png)
+
 ## Summary {#flexdashboard-summary}
 You can use R Markdown to create dashboards with the _flexdashboard_ package. With the _flexdashboard_ package, we can create dashboards that have different pages and we can add columns to those pages. In this chapter, we created a St. Louis Dashboard with three pages for the St. Louis ward maps, unemployment plots, and aldermen information.
 

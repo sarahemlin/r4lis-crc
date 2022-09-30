@@ -48,4 +48,4 @@ In 2022, the company RStudio, PBC changed its name to Posit, PBC.  The open sour
 
 ## Acknowledgments {-}
 
-We would like to thank the following individuals for the gift of their time, insight, and support while we wrote and edited this book: Greg Wilson, Myfawnwy Johnston, Patrick Alston, Emily Nimsakont, Luke Johnston, Carl Howe, Emil Hvitfeldt and Julia Silge.
+We would like to thank the following individuals for the gift of their time, insight, and support while we wrote and edited this book: Greg Wilson, Rafael Leonardo Da Silva, Emily Nimsakont, Myfanwy Johnston, Patrick Alston, Luke Johnston, Carl Howe, Emil Hvitfeldt and Julia Silge.

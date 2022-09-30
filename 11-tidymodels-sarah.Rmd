@@ -81,7 +81,7 @@ These algorithms use words that appear in "successful" applications with current
 Machine learning is ubiquitous, but we need to understand how it works because it's so intertwined with our personal and professional lives.  Supervised machine learning uses data to fit a model that predicts results, where people decide to set sample sizes, set model parameters, and adjust the model's fit.  Because people make the data and they make the algorithms, they are both fallible, and placing blind faith in algorithmic predictions as "truth" is unwarranted.  There are many places where bias can creep into an ML algorithm, making it critical that we probe the origins of the analyzed data and unpack assumptions therein.
 
 ##  Further Practice {#ml-study} 
-  * Work through the examples in each chapter of _Supervised machine learning for text analysis in R_ by Emily Hvitfeldt & Julia Silge: https://smltar.com/
+  * Work through the examples in each chapter of _Supervised machine learning for text analysis in R_ by Emil Hvitfeldt & Julia Silge: https://smltar.com/
 
 ##  Additional Resources {#ml-resources}
   * Tidymodels website: https://tidymodels.org

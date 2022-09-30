@@ -74,16 +74,18 @@ The R Markdown syntax allows you to add specific styling to your document, such 
 - `###` is header 3
 
 **Other styles**
+
 - `*` Before and after the words: Italicized
 - `**`Before and after the words: Bold
 
 **Creating lists**
-`-` after each item on the list, create an unordered list.
-`1.` and continuing the numbers sequentially to create an ordered list.
+
+- `-` after each item on the list, create an unordered list.
+- `1.` and continuing the numbers sequentially to create an ordered list.
 
 **Links**
-`[Website Link](www.website.com)`
-The bracket contains the link text while we put the web address
+
+- `[Website Link](www.website.com)`: the bracket contains the link text while we put the web address
 within the parentheses. 
 
 ![Showing the output for headers, another styling like italicization and bolding along with unordered and ordered lists](images/rmarkdown_2.png)
@@ -92,32 +94,41 @@ within the parentheses.
 You can embed code in your R Markdown document by adding code chunks.  You can do this by clicking on the green 'C' icon at the top of the Editing pane, and you can choose to add a code chunk for a variety of coding languages.  You can also manually add the code chunk by typing the code below.
 
 **Code chunk options**
+
 You can set various options related to the code output and the display of the code within `{r}` section of the code chunk.
+
 - `include = FALSE` prevents the code output and code from being shown in the document you create.  Other chunks can still use the output of the code.
 - `echo = FALSE` shows the output but not the code. 
 
 Let's show how this works with loading the information about the aldermen.
 
 **Code example with `echo = FALSE`**
-```{r, echo = FALSE}
+```{r, echo = FALSE, message=FALSE, results='hide'}
 #code example with using echo as FALSE
 aldermen_info = read_csv("data/aldermen-contact.csv")
 ```
 
+![](images/echo-false.png)
+
 **Code example with `echo = TRUE`**
-```{r, echo = TRUE}
+```{r, echo = TRUE, message=FALSE, results='hide'}
 #code example with using echo as TRUE
 aldermen_info = read_csv("data/aldermen-contact.csv")
 ```
-With `echo = FALSE`, you will not see the output of reading in the csv with the alderman contact information, while when `echo = TRUE`, you can see the output. 
 
-Code example with `include = TRUE`
-```{r, include = TRUE}
+![](images/echo-false.png)
+
+With `echo = FALSE`, you will not see the code in the output of reading in the csv with the alderman contact information, while when `echo = TRUE`, you can see the code and the output. 
+
+**Code example with `include = TRUE`**
+```{r, include = TRUE, message=FALSE, results='hide'}
 # code example with using include = TRUE 
 aldermen_info = read_csv("data/aldermen-contact.csv")
 ```
 
-Code example with `include = `FALSE`
+![](images/echo-false.png)
+
+**Code example with `include = FALSE`**
 ```{r, include = FALSE}
 aldermen_info = read_csv("data/aldermen-contact.csv")
 ```
@@ -156,16 +167,17 @@ tm_shape(stl_wards, unit = "mi") +
 ## Creating your output {#rmd-output}
 You know how to add stylistic elements and code to your RMarkdown document, but how do you transform the R Markdown syntax and chunks in your R Markdown file to an output document like a PDF or Word file?  Rendering is the process of converting the R Markdown syntax and code chunks into a document.  The _knitr_ package is required to do this rendering.  There are two ways in which you can do the rendering.  When you create an R Markdown document in RStudio, you will see a Knit button in the document toolbar.  If you press the arrow next to the Knit icon, you will see options to Knit to PDF, Knit to HTML, and Knit to Word.  One thing to note is that if you want to create a PDF document, you must install the _tinytex_ package by typing `tinytex::install_tinytex()`.  Here are examples of the various output options displaying the same content in the markdown document.
 
-**Knit to PDF**
 ![PDF output showing the code  St. Louis wards map](images/pdf_output1.png)
+
 
 ![PDF output showing the map of St. Louis wards](images/pdf_output2.png)
 
-**Knit to HTML**
+
 ![HTML document showing a map of St. Louis wards and the code that created the map](images/html_output.png)
 
-**Knit to Word**
+
 ![Word document showing a map of St. Louis wards and the code that created the map](images/word_output.png)
+
 
 ## Customizing your R Markdown document with templates {#rmd-customize}
 You can customize your R Markdown document through a template you create on your own or through a pre-built template and call it through the "output" parameter in the YAML headers.  We will focus on using a pre-built template.  You can look at examples of R Markdown templates on the R Markdown gallery^[https://rmarkdown.rstudio.com/gallery.html].  There are existing templates you can choose from when you create a new R Markdown document, and you can also add a template by changing the output parameter of the YAML header. 

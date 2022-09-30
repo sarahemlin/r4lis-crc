@@ -135,7 +135,7 @@ This overview of spatial data is just to get you up and running. For more in-dep
 The type of spatial data that we will be working with is called a **shapefile**. A shapefile is a vector data format that holds the spatial object, and the attribute information of that spatial object. It is actually made of up several files such as a database file, an xml file that holds the metadata, and a projection file (if the shapefile already has a projection). We are going to load in the WARDS_2010 shapefile which was retrieved from the St. Louis City open data portal^[https://www.stlouis-mo.gov/data/]. If you take a look at the WARDS_2010 shapefile, you will see that it is actually comprised of several files such as WARDS_2010.prj, which holds the projection, and WARDS_2010.dbf that holds the attribute information for each ward. 
 
 We will need to use `st_read()` function from the _sf_ package to load the shapefile into RStudio. After that, we will use the `st_crs()` function to see if the shapefile has a coordinate system. We are also going to read the unemployment_tract shapefile that was created in the previous chapter.
-```{r stl_data}
+```{r stl_data, message=FALSE, results='hide'}
 stl_wards <- st_read("nbrhds_wards/WARDS_2010.shp")
 stl_tracts <- st_read(
   "unemployment_tract/unemployment_tract.shp"
