@@ -6,3 +6,5 @@ _book
 _bookdown_files
 bookdown.rds
 bookdown.pdf
+renv
+library
