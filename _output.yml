@@ -22,7 +22,7 @@ bookdown::pdf_book:
   latex_engine: xelatex
   citation_package: natbib
   template: null
-  pandoc_args: --top-level-division=chapter
+  pandoc_args: [ "--top-level-division=chapter", "--csl", "taylor-and-francis-chicago-author-date.csl" ]
   toc_depth: 2
   toc_unnumbered: false
   toc_appendix: true
