@@ -1,3 +1,8 @@
+---
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
 # Using RStudio's IDE {#rstudio}
 
 ## Learning Objectives{#rstudio-los}
@@ -115,7 +120,25 @@ With four panes, the IDE screen looks like this:
 ## Packages needed for this book {#pkgs-download}
 As you progress in your data science journey, you will install more and more R packages.  As with any new project you start, begin by installing all the packages you will need to use.  Please see the appendix for instructions on installing additional software that these packages depend on to function properly (commonly called 'dependencies').  You might see prompts in the console during this process.  If you're asked to install other packages, say 'yes.'  If you're asked if you want to compile binaries from source, say 'no.'  Please see the appendix if you encounter error codes during installation.
 
-```{r packages, eval=FALSE}
+The R command to install packages is `install.packages()`.  Inside the parentheses, you will type the package name, such as _tidyverse_, in quotes:
+
+```{r pkg-example, eval=FALSE, warning=FALSE, message=FALSE, results='hide'}
+install.packages("tidyverse")
+```
+
+For the exercises include in this book, you'll need to install the following packages.  We've included a link to information about each package in the table below.
+
+```{r pkg-table, echo=FALSE, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(knitr)
+
+packages <- read.csv("pkgs.csv")
+knitr::kable(packages, "simple", caption = "**Packages needed in this book**")
+```
+
+
+
+```{r packages, include=FALSE, eval=FALSE}
 lapply(
   c(
     "xfun",
